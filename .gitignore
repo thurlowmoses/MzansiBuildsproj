@@ -2,6 +2,13 @@
 .env
 .env.local
 .env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+dataconnect/.env
+dataconnect/.env.local
+functions/.env
+functions/.env.local
 
 # Frontend
 frontend/node_modules/
