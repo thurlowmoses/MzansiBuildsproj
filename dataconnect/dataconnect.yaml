@@ -1,6 +1,7 @@
 specVersion: "v1"
 serviceId: "mzansibuildsproj"
 location: "europe-west3"
+# Data Connect schema source.
 schemas:
   - source: "./schema"
     datasource:

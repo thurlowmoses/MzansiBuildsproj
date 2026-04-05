@@ -1,3 +1,6 @@
+"""
+Users, projects, updates, follows, comments, and likes for demo data.
+"""
 type User @table {
   displayName: String!
   username: String!

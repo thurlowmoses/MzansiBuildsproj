@@ -1,5 +1,12 @@
-query GetPublicProjects @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only retrieves public projects.") {
-  projects(where: {isPublic: {eq: true}}) {
+"""
+Public read example for the generated client.
+"""
+query GetPublicProjects
+@auth(
+  level: PUBLIC
+  insecureReason: "This operation is safe to expose to the public as it only retrieves public projects."
+) {
+  projects(where: { isPublic: { eq: true } }) {
     id
     name
     description
