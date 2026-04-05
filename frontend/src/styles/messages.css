@@ -1,0 +1,169 @@
+.messages-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--spacing-lg);
+}
+
+.messages-sidebar,
+.messages-thread {
+  background: #121a27;
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px rgba(3, 8, 15, 0.45);
+}
+
+.messages-sidebar {
+  padding: var(--spacing-lg);
+  color: #d6dde8;
+}
+
+.messages-sidebar h1 {
+  margin-bottom: var(--spacing-sm);
+  color: #f8fbff;
+}
+
+.messages-sidebar p {
+  color: #9ab0c9;
+  margin-bottom: var(--spacing-md);
+}
+
+.developer-list {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.developer-item {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d6dde8;
+  padding: 10px 12px;
+}
+
+.developer-item.active,
+.developer-item:hover {
+  border-color: rgba(16, 185, 129, 0.75);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.developer-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  background: linear-gradient(130deg, #10b981, #0ea5a5);
+  color: #072114;
+}
+
+.developer-meta {
+  display: grid;
+  gap: 2px;
+}
+
+.developer-meta strong {
+  color: #f8fbff;
+}
+
+.developer-meta small {
+  color: #9ab0c9;
+}
+
+.messages-thread {
+  padding: var(--spacing-lg);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 70vh;
+}
+
+.thread-header h2 {
+  color: #f8fbff;
+  margin-bottom: 6px;
+}
+
+.thread-header p {
+  color: #9ab0c9;
+}
+
+.thread-messages {
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+}
+
+.bubble p {
+  margin: 0 0 5px;
+  color: #f2f7ff;
+}
+
+.bubble small {
+  color: #8ea6c3;
+}
+
+.bubble.mine {
+  justify-self: end;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.bubble.theirs {
+  justify-self: start;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.thread-empty {
+  color: #9ab0c9;
+}
+
+.thread-compose {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.thread-compose textarea {
+  min-height: 88px;
+  background: #0f1622;
+  color: #f2f7ff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.thread-compose button {
+  justify-self: end;
+  background: linear-gradient(140deg, #10b981, #059669);
+  color: #022112;
+  font-weight: 700;
+  padding: 10px 16px;
+}
+
+.thread-compose button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 960px) {
+  .messages-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .messages-thread {
+    min-height: 60vh;
+  }
+}

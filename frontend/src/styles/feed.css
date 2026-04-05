@@ -1,0 +1,108 @@
+.feed-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #fff;
+  padding: 2rem 1rem;
+}
+
+.feed-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.feed-title {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.feed-subtitle {
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.feed-state {
+  color: #cbd5e1;
+}
+
+.feed-error {
+  color: #ef4444;
+}
+
+.feed-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.feed-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.feed-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feed-card-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.feed-stage {
+  background: #1f2937;
+  color: #86efac;
+  border: 1px solid #14532d;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.feed-description {
+  margin-top: 0.8rem;
+  color: #e5e7eb;
+}
+
+.feed-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.feed-tag {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #bae6fd;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+.feed-support {
+  margin-top: 0.75rem;
+  color: #d1fae5;
+}
+
+.feed-meta {
+  margin-top: 0.75rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.feed-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: #86efac;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.feed-link:hover {
+  text-decoration: underline;
+}

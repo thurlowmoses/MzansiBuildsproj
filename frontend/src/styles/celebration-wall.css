@@ -1,0 +1,82 @@
+.celebration-page {
+  min-height: 100vh;
+  background: #050505;
+  color: #fff;
+  padding: 2rem 1rem;
+}
+
+.celebration-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.celebration-container h1 {
+  margin: 0;
+}
+
+.celebration-subtitle {
+  color: #9ca3af;
+  margin-top: 0.5rem;
+}
+
+.celebration-error {
+  color: #ef4444;
+}
+
+.celebration-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.celebration-card {
+  background: #111;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.celebration-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.celebration-card p {
+  margin: 0;
+  color: #d1d5db;
+}
+
+.celebration-meta {
+  margin-top: 0.7rem;
+  color: #a7f3d0;
+  font-size: 0.85rem;
+}
+
+.celebration-tags {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.celebration-tags span {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #bae6fd;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+}
+
+.celebration-link {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: #86efac;
+  text-decoration: none;
+}
+
+.celebration-link:hover {
+  text-decoration: underline;
+}

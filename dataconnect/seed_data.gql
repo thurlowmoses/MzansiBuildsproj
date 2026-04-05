@@ -1,0 +1,126 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This mutation seeds data and should only be run by authenticated users. 'auth.uid' is not directly used for filtering within the mutation.") {
+  user_upsertMany(data: [
+    {
+      id: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      displayName: "Alice Smith",
+      username: "alicesmith",
+      email: "alice@example.com",
+      createdAt: "2024-01-01T10:00:00Z",
+      bio: "Software Engineer with a passion for open-source projects.",
+      photoUrl: "https://example.com/alice.jpg",
+      githubProfileUrl: "https://github.com/alicesmith",
+      linkedinProfileUrl: "https://linkedin.com/in/alicesmith"
+    },
+    {
+      id: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      displayName: "Bob Johnson",
+      username: "bobjohnson",
+      email: "bob@example.com",
+      createdAt: "2024-01-02T11:30:00Z",
+      bio: "Full-stack developer building innovative web applications.",
+      photoUrl: "https://example.com/bob.jpg",
+      githubProfileUrl: "https://github.com/bobjohnson",
+      linkedinProfileUrl: "https://linkedin.com/in/bobjohnson"
+    },
+    {
+      id: "c7d2e8g9-3b4a-5c8f-0d1e-2f3g4h5i6j7k",
+      displayName: "Charlie Brown",
+      username: "charliebrown",
+      email: "charlie@example.com",
+      createdAt: "2024-01-03T14:15:00Z",
+      bio: "UI/UX designer with a focus on user-centric experiences.",
+      photoUrl: "https://example.com/charlie.jpg",
+      githubProfileUrl: "https://github.com/charliebrown",
+      linkedinProfileUrl: "https://linkedin.com/in/charliebrown"
+    }
+  ])
+  project_upsertMany(data: [
+    {
+      id: "d9f8e7c6-5b4a-3d2e-1c0b-9a8b7c6d5e4f",
+      userId: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      name: "My Awesome Project",
+      description: "A fantastic project that solves a common problem.",
+      createdAt: "2024-01-05T09:00:00Z",
+      isPublic: true,
+      technologiesUsed: ["React", "Node.js", "PostgreSQL"],
+      githubRepoUrl: "https://github.com/alicesmith/awesome-project",
+      liveDemoUrl: "https://awesome-project.com"
+    },
+    {
+      id: "e0f1g2h3-4i5j-6k7l-8m9n-0o1p2q3r4s5t",
+      userId: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      name: "Cool Chat App",
+      description: "Real-time chat application with secure messaging.",
+      createdAt: "2024-01-06T13:45:00Z",
+      isPublic: true,
+      technologiesUsed: ["Vue.js", "Firebase", "WebSocket"],
+      githubRepoUrl: "https://github.com/bobjohnson/chat-app",
+      liveDemoUrl: "https://chat-app.netlify.app"
+    }
+  ])
+  projectUpdate_upsertMany(data: [
+    {
+      id: "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+      projectId: "d9f8e7c6-5b4a-3d2e-1c0b-9a8b7c6d5e4f",
+      title: "Initial Release",
+      content: "First public release of My Awesome Project, including core features.",
+      createdAt: "2024-01-07T10:00:00Z",
+      isPublic: true,
+      imageUrl: "https://example.com/project-update-1.jpg"
+    },
+    {
+      id: "g2h3i4j5-k6l7-m8n9-o0p1-q2r3s4t5u6v7",
+      projectId: "e0f1g2h3-4i5j-6k7l-8m9n-0o1p2q3r4s5t",
+      title: "Added Emoji Support",
+      content: "Users can now express themselves with a wide range of emojis in chat.",
+      createdAt: "2024-01-08T15:30:00Z",
+      isPublic: true,
+      imageUrl: "https://example.com/chat-emoji.png"
+    }
+  ])
+  comment_upsertMany(data: [
+    {
+      id: "h3i4j5k6-l7m8-n9o0-p1q2-r3s4t5u6v7w8",
+      projectUpdateId: "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+      userId: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      content: "Great work, Alice! Looking forward to trying it out.",
+      createdAt: "2024-01-07T11:00:00Z"
+    },
+    {
+      id: "i4j5k6l7-m8n9-o0p1-q2r3-s4t5u6v7w8x9",
+      projectUpdateId: "g2h3i4j5-k6l7-m8n9-o0p1-q2r3s4t5u6v7",
+      userId: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      content: "Awesome feature, Bob! Emojis make everything better.",
+      createdAt: "2024-01-08T16:00:00Z"
+    }
+  ])
+  like_upsertMany(data: [
+    {
+      projectUpdateId: "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+      userId: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      createdAt: "2024-01-07T10:30:00Z"
+    },
+    {
+      projectUpdateId: "f1g2h3i4-j5k6-l7m8-n9o0-p1q2r3s4t5u6",
+      userId: "c7d2e8g9-3b4a-5c8f-0d1e-2f3g4h5i6j7k",
+      createdAt: "2024-01-07T12:00:00Z"
+    },
+    {
+      projectUpdateId: "g2h3i4j5-k6l7-m8n9-o0p1-q2r3s4t5u6v7",
+      userId: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      createdAt: "2024-01-08T15:45:00Z"
+    }
+  ])
+  follow_upsertMany(data: [
+    {
+      followerId: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      followeeId: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      createdAt: "2024-01-04T08:00:00Z"
+    },
+    {
+      followerId: "a8e1b6f5-2a3c-4d7e-9f0a-1b2c3d4e5f60",
+      followeeId: "6e263d50-e7f1-4a5f-9c02-8a9d0a7a0e67",
+      createdAt: "2024-01-04T08:15:00Z"
+    }
+  ])
+}

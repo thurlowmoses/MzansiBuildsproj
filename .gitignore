@@ -1,0 +1,51 @@
+# Environment variables (NEVER commit these - contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.DS_Store
+
+# Backend
+backend/__pycache__/
+backend/*.pyc
+backend/.venv/
+backend/venv/
+backend/.env
+backend/.DS_Store
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Dependencies
+node_modules/
+.pip-cache/
+
+# Build outputs
+dist/
+build/
+
+# Testing
+coverage/
+.coverage
+
+# Python
+*.egg-info/
+dist/
+build/

@@ -1,0 +1,49 @@
+type User @table {
+  displayName: String!
+  username: String!
+  createdAt: Timestamp!
+  email: String
+  bio: String
+  photoUrl: String
+  githubProfileUrl: String
+  linkedinProfileUrl: String
+}
+
+type Project @table {
+  name: String!
+  description: String!
+  createdAt: Timestamp!
+  isPublic: Boolean!
+  user: User
+  technologiesUsed: [String]
+  githubRepoUrl: String
+  liveDemoUrl: String
+}
+
+type ProjectUpdate @table {
+  title: String!
+  content: String!
+  createdAt: Timestamp!
+  isPublic: Boolean!
+  project: Project
+  imageUrl: String
+}
+
+type Follow @table(key: ["follower", "followee"]) {
+  follower: User!
+  followee: User!
+  createdAt: Timestamp!
+}
+
+type Comment @table {
+  content: String!
+  createdAt: Timestamp!
+  user: User
+  projectUpdate: ProjectUpdate
+}
+
+type Like @table(key: ["user", "projectUpdate"]) {
+  createdAt: Timestamp!
+  user: User!
+  projectUpdate: ProjectUpdate!
+}
