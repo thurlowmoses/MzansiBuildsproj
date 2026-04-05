@@ -65,6 +65,31 @@
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
+.profile-privacy-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-gray-medium);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.profile-privacy-row label {
+  margin: 0;
+  font-weight: 600;
+}
+
+.profile-privacy-row input {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-privacy-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-dark);
+}
+
 .profile-button {
   background-color: var(--color-primary);
   color: var(--color-white);

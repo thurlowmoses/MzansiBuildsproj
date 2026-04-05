@@ -39,6 +39,7 @@ export function AuthProvider({ children }) {
         displayName: displayName || credential.user.email?.split("@")[0] || "Developer",
         email: credential.user.email,
         bio: "",
+        isPrivate: false,
         photoURL: credential.user.photoURL || "",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),

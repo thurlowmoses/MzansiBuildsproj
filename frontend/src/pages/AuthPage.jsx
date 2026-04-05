@@ -1,7 +1,33 @@
 import { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/auth.css";
+
+function validateStrongPassword(password) {
+	if (password.length < 12) {
+		return "Password must be at least 12 characters long.";
+	}
+
+	if (!/[A-Z]/.test(password)) {
+		return "Password must include at least one uppercase letter.";
+	}
+
+	if (!/[a-z]/.test(password)) {
+		return "Password must include at least one lowercase letter.";
+	}
+
+	if (!/\d/.test(password)) {
+		return "Password must include at least one number.";
+	}
+
+	if (!/[!@#$%^&*()[\]{}\-_=+|;:'",.<>/?`~]/.test(password)) {
+		return "Password must include at least one special character.";
+	}
+
+	return "";
+}
 
 function AuthPage() {
 	const navigate = useNavigate();
@@ -31,6 +57,11 @@ function AuthPage() {
 
 		try {
 			if (mode === "register") {
+				const passwordError = validateStrongPassword(formData.password);
+				if (passwordError) {
+					throw new Error(passwordError);
+				}
+
 				if (formData.password !== formData.confirmPassword) {
 					throw new Error("Passwords do not match.");
 				}
@@ -55,6 +86,22 @@ function AuthPage() {
 			setErrorMessage(error.message || "Authentication failed. Please try again.");
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	const onForgotPassword = async () => {
+		try {
+			setErrorMessage("");
+			setSuccessMessage("");
+
+			if (!formData.email.trim()) {
+				throw new Error("Enter your email address first, then click Forgot password.");
+			}
+
+			await sendPasswordResetEmail(auth, formData.email.trim());
+			setSuccessMessage("Password reset email sent. Check your inbox.");
+		} catch (error) {
+			setErrorMessage(error.message || "Could not send password reset email.");
 		}
 	};
 
@@ -99,8 +146,13 @@ function AuthPage() {
 							value={formData.password}
 							onChange={onChange}
 							required
-							minLength={6}
+							minLength={12}
 						/>
+						{mode === "register" && (
+							<p className="password-hint">
+								Use 12+ characters with uppercase, lowercase, number, and special character.
+							</p>
+						)}
 					</div>
 
 					{mode === "register" && (
@@ -113,9 +165,15 @@ function AuthPage() {
 								value={formData.confirmPassword}
 								onChange={onChange}
 								required
-								minLength={6}
+								minLength={12}
 							/>
 						</div>
+					)}
+
+					{mode === "login" && (
+						<button type="button" className="forgot-password-btn" onClick={onForgotPassword}>
+							Forgot password?
+						</button>
 					)}
 
 					<button className="auth-button" type="submit" disabled={loading}>

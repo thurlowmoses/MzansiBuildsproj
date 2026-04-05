@@ -12,6 +12,7 @@ class UpdateProfileRequest(BaseModel):
 	displayName: str | None = None
 	bio: str | None = None
 	photoURL: str | None = None
+	isPrivate: bool | None = None
 
 
 @router.get("/me")
@@ -25,6 +26,7 @@ def get_my_profile(user: CurrentUser = CurrentUserDep):
 			"email": user.email,
 			"displayName": user.name,
 			"bio": "",
+			"isPrivate": False,
 			"photoURL": "",
 		}
 
@@ -33,6 +35,7 @@ def get_my_profile(user: CurrentUser = CurrentUserDep):
 	profile.setdefault("email", user.email)
 	profile.setdefault("displayName", user.name)
 	profile.setdefault("bio", "")
+	profile.setdefault("isPrivate", False)
 	profile.setdefault("photoURL", "")
 	return profile
 

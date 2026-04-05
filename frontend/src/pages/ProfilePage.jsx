@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { fetchMyProfile, updateMyProfile } from "../api/backendClient";
-import { auth } from "../firebase_config";
+import { auth, db } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/profile.css";
 
@@ -10,11 +11,14 @@ function ProfilePage() {
 	const [formData, setFormData] = useState({
 		displayName: "",
 		bio: "",
+		isPrivate: false,
 	});
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [errorMessage, setErrorMessage] = useState("");
 	const [successMessage, setSuccessMessage] = useState("");
+	const [followersCount, setFollowersCount] = useState(0);
+	const [followingCount, setFollowingCount] = useState(0);
 
 	useEffect(() => {
 		const loadProfile = async () => {
@@ -26,6 +30,7 @@ function ProfilePage() {
 				setFormData({
 					displayName: profile.displayName || user.displayName || "",
 					bio: profile.bio || "",
+					isPrivate: Boolean(profile.isPrivate),
 				});
 			} catch (error) {
 				setErrorMessage(error.message || "Could not load profile.");
@@ -37,9 +42,33 @@ function ProfilePage() {
 		loadProfile();
 	}, [user]);
 
+	useEffect(() => {
+		if (!user?.uid) {
+			setFollowersCount(0);
+			setFollowingCount(0);
+			return;
+		}
+
+		const followersQuery = query(collection(db, "follows"), where("followingId", "==", user.uid));
+		const followingQuery = query(collection(db, "follows"), where("followerId", "==", user.uid));
+
+		const unsubFollowers = onSnapshot(followersQuery, (snapshot) => {
+			setFollowersCount(snapshot.size);
+		});
+
+		const unsubFollowing = onSnapshot(followingQuery, (snapshot) => {
+			setFollowingCount(snapshot.size);
+		});
+
+		return () => {
+			unsubFollowers();
+			unsubFollowing();
+		};
+	}, [user?.uid]);
+
 	const onChange = (event) => {
-		const { name, value } = event.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
+		const { name, value, type, checked } = event.target;
+		setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
 	};
 
 	const onSubmit = async (event) => {
@@ -59,6 +88,7 @@ function ProfilePage() {
 			await updateMyProfile({
 				displayName: formData.displayName,
 				bio: formData.bio,
+				isPrivate: formData.isPrivate,
 			});
 
 			setSuccessMessage("Profile updated successfully.");
@@ -97,6 +127,14 @@ function ProfilePage() {
 						<span className="profile-info-label">Verified</span>
 						<span>{user?.emailVerified ? "Yes" : "No"}</span>
 					</div>
+					<div className="profile-info-row">
+						<span className="profile-info-label">Followers</span>
+						<span>{followersCount.toLocaleString()}</span>
+					</div>
+					<div className="profile-info-row">
+						<span className="profile-info-label">Following</span>
+						<span>{followingCount.toLocaleString()}</span>
+					</div>
 				</div>
 
 				<form className="profile-form" onSubmit={onSubmit}>
@@ -123,6 +161,20 @@ function ProfilePage() {
 							placeholder="Tell other developers what you are working on"
 						/>
 					</div>
+
+					<div className="profile-privacy-row">
+						<label htmlFor="isPrivate">Private account</label>
+						<input
+							id="isPrivate"
+							name="isPrivate"
+							type="checkbox"
+							checked={formData.isPrivate}
+							onChange={onChange}
+						/>
+					</div>
+					<p className="profile-privacy-note">
+						When private, only you and followers can see your project activity.
+					</p>
 
 					<button className="profile-button" type="submit" disabled={saving}>
 						{saving ? "Saving..." : "Save Profile"}
