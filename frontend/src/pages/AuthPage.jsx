@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import "../styles/auth.css";
 
 function validateStrongPassword(password) {
+	// Keep registration passwords strict.
 	if (password.length < 12) {
 		return "Password must be at least 12 characters long.";
 	}
@@ -90,6 +91,7 @@ function AuthPage() {
 	};
 
 	const onForgotPassword = async () => {
+		// Trigger Firebase reset email from the login form.
 		try {
 			setErrorMessage("");
 			setSuccessMessage("");
@@ -176,6 +178,7 @@ function AuthPage() {
 						</button>
 					)}
 
+					{/* Submit action changes by mode. */}
 					<button className="auth-button" type="submit" disabled={loading}>
 						{loading ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
 					</button>

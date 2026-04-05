@@ -10,7 +10,9 @@ frontend/.DS_Store
 
 # Backend
 backend/__pycache__/
+backend/**/__pycache__/
 backend/*.pyc
+backend/**/*.pyc
 backend/.venv/
 backend/venv/
 backend/.env

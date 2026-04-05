@@ -7,6 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import "../styles/profile.css";
 
 function ProfilePage() {
+	// Profile form mirrors the backend record.
 	const { user } = useAuth();
 	const [formData, setFormData] = useState({
 		displayName: "",
@@ -21,6 +22,7 @@ function ProfilePage() {
 	const [followingCount, setFollowingCount] = useState(0);
 
 	useEffect(() => {
+	               // Load the current profile once auth is ready.
 		const loadProfile = async () => {
 			if (!user) return;
 
@@ -43,6 +45,7 @@ function ProfilePage() {
 	}, [user]);
 
 	useEffect(() => {
+	               // Live follower counts keep the page useful.
 		if (!user?.uid) {
 			setFollowersCount(0);
 			setFollowingCount(0);
@@ -67,11 +70,13 @@ function ProfilePage() {
 	}, [user?.uid]);
 
 	const onChange = (event) => {
+	               // Support both text and checkbox fields.
 		const { name, value, type, checked } = event.target;
 		setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
 	};
 
 	const onSubmit = async (event) => {
+	               // Persist the form and sync Firebase auth display name.
 		event.preventDefault();
 
 		if (!user) return;
@@ -163,6 +168,7 @@ function ProfilePage() {
 					</div>
 
 					<div className="profile-privacy-row">
+	                                               {/* Private account toggle. */}
 						<label htmlFor="isPrivate">Private account</label>
 						<input
 							id="isPrivate"

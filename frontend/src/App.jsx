@@ -20,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
 
+          {/* Protected app routes live behind auth. */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Navigate to="/feed" replace />} />
             <Route path="/feed" element={<FeedPage />} />

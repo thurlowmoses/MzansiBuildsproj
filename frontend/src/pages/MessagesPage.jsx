@@ -24,6 +24,7 @@ function formatTimeLabel(timestamp) {
 }
 
 function MessagesPage() {
+  // Inbox state is driven by Firestore snapshots.
   const { user } = useAuth();
   const location = useLocation();
   const [developers, setDevelopers] = useState([]);
@@ -39,12 +40,14 @@ function MessagesPage() {
   const [showAccountPreview, setShowAccountPreview] = useState(false);
 
   useEffect(() => {
+    // Pre-fill search from the navbar query string.
     const params = new URLSearchParams(location.search);
     const q = params.get("q") || "";
     setSearchText(q);
   }, [location.search]);
 
   useEffect(() => {
+    // Build the developer directory.
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
       const items = snapshot.docs
         .map((docItem) => {
@@ -67,6 +70,7 @@ function MessagesPage() {
   }, [user?.uid]);
 
   useEffect(() => {
+    // Track who the current user follows.
     if (!user?.uid) {
       setFollowingSet(new Set());
       return;
@@ -83,6 +87,7 @@ function MessagesPage() {
   }, [user?.uid]);
 
   useEffect(() => {
+    // Count followers for profile badges.
     const unsubscribe = onSnapshot(collection(db, "follows"), (snapshot) => {
       const counts = {};
 
@@ -99,6 +104,7 @@ function MessagesPage() {
   }, []);
 
   useEffect(() => {
+    // Load inbox threads for the current user.
     if (!user?.uid) {
       setChats([]);
       return;
@@ -128,6 +134,7 @@ function MessagesPage() {
   }, [user?.uid]);
 
   useEffect(() => {
+    // Subscribe to the selected thread messages.
     if (!selectedChatId) {
       setMessages([]);
       return;
@@ -203,12 +210,14 @@ function MessagesPage() {
   const canMessage = (developer) => !developer?.isPrivate || followingSet.has(developer.id);
 
   const openConversation = (chatId, peerId) => {
+    // Open an existing thread.
     setSelectedUserId(peerId);
     setSelectedChatId(chatId);
     setShowAccountPreview(false);
   };
 
   const openChatWithDeveloper = (developerId) => {
+    // Private accounts stay locked until followed.
     const target = developersById[developerId];
     if (target && !canMessage(target)) {
       return;
@@ -229,6 +238,7 @@ function MessagesPage() {
   };
 
   const toggleFollow = async (developerId) => {
+    // Toggle follow state with one document.
     if (!user?.uid) return;
 
     const relationshipId = `${user.uid}_${developerId}`;
@@ -246,6 +256,7 @@ function MessagesPage() {
   };
 
   const onSend = async () => {
+    // Create the thread if needed, then add the message.
     if (!user?.uid || !selectedUser || !draft.trim()) {
       return;
     }
@@ -374,6 +385,7 @@ function MessagesPage() {
         <div className="messages-thread">
           <header className="thread-header">
             {selectedUser ? (
+              /* Thread summary and account action. */
               <div className="thread-head-main">
                 <div>
                   <h2>{selectedUser.name}</h2>
@@ -400,6 +412,7 @@ function MessagesPage() {
           </header>
 
           {selectedUser && showAccountPreview ? (
+            /* Compact profile preview. */
             <section className="account-preview-card" aria-label="Selected developer account preview">
               <h3>{selectedUser.name}</h3>
               <p>{selectedUser.email || "No public email"}</p>

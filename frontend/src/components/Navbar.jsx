@@ -108,6 +108,7 @@ function Navbar() {
 
   const messageCount = useMemo(() => Math.min(activePeople.length, 9), [activePeople.length]);
 
+  // Send top-bar searches straight to messages.
   const onSearchSubmit = (event) => {
     event.preventDefault();
 
@@ -129,7 +130,7 @@ function Navbar() {
 
     <nav className="navbar-instagram">
       <div className="navbar-wrapper">
-        {/* Left: Logo */}
+        {/* Brand link. */}
         <NavLink to="/feed" className="navbar-logo">
           <span className="logo-icon" aria-hidden="true">
             <IconSpark />
@@ -137,7 +138,7 @@ function Navbar() {
           <span className="logo-text">MzansiBuilds</span>
         </NavLink>
 
-        {/* Center: Search */}
+        {/* Developer search. */}
         <form className="navbar-search" onSubmit={onSearchSubmit}>
           <input
             type="text"
@@ -148,7 +149,7 @@ function Navbar() {
           />
         </form>
 
-        {/* Right: Icons */}
+        {/* Quick nav actions. */}
         <div className="navbar-icons">
           <NavLink to="/feed" className="nav-icon" title="Feed">
             <IconHome />
@@ -180,7 +181,7 @@ function Navbar() {
             <span className="sr-only">Help assistant</span>
           </NavLink>
 
-          {/* Settings Dropdown */}
+          {/* Settings menu. */}
           <div className="navbar-settings-container">
             <button
               type="button"

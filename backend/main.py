@@ -8,6 +8,7 @@ from routes.users import router as users_router
 
 load_dotenv()
 
+# App bootstrap and cross-origin setup.
 app = FastAPI(
     title="MzansiBuilds API",
     description="Backend for MzansiBuilds — a platform for developers building in public.",
@@ -28,10 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Lightweight health probe for hosting.
 @app.get("/health")
 async def health_check():
     return {"status": "MzansiBuilds API is running"}
 
+# Root endpoint for quick sanity checks.
 @app.get("/")
 async def root():
     return {

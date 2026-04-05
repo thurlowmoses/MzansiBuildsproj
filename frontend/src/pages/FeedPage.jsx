@@ -20,6 +20,7 @@ const STAGE_CLASS = {
 };
 
 function ProjectCard({ project, onComment, onCollab, navigate }) {
+	// Local state keeps the card self-contained.
 	const [comment, setComment] = useState("");
 	const [showComments, setShowComments] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
@@ -28,6 +29,7 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 	const stageClass = STAGE_CLASS[stage] || STAGE_CLASS.idea;
 
 	const handleComment = async () => {
+		// Skip empty submissions.
 		const value = comment.trim();
 		if (!value) return;
 
@@ -40,6 +42,7 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 	return (
 		<article className="project-card">
 			<header className="card-header">
+				{/* Owner and stage summary. */}
 				<div className="avatar">{(project.userName || "A")[0].toUpperCase()}</div>
 				<div className="card-meta">
 					<p className="card-username">{project.userName || "Developer"}</p>
@@ -55,6 +58,7 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 			</header>
 
 			<div className="card-body">
+				{/* Main project details. */}
 				<h3
 					className="card-title"
 					onClick={() =>
@@ -86,6 +90,7 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 
 			{!project.isGitHub ? (
 				<>
+					{/* Engagement actions. */}
 					<div className="card-actions">
 						<button type="button" className="action-btn" onClick={() => setShowComments((prev) => !prev)}>
 							Comment
@@ -118,6 +123,7 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 }
 
 function FeedPage() {
+	// Feed data stays live through Firestore snapshots.
 	const navigate = useNavigate();
 	const [userProjects, setUserProjects] = useState([]);
 	const [loadingUser, setLoadingUser] = useState(true);
@@ -126,6 +132,7 @@ function FeedPage() {
 	const [followingSet, setFollowingSet] = useState(new Set());
 
 	useEffect(() => {
+		// Load public project cards in real time.
 		const projectsQuery = query(collection(db, "projects"), orderBy("createdAt", "desc"));
 
 		const unsubscribe = onSnapshot(
@@ -145,6 +152,7 @@ function FeedPage() {
 	}, []);
 
 	useEffect(() => {
+		// Cache privacy flags for feed filtering.
 		const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
 			const mapping = {};
 			snapshot.docs.forEach((docItem) => {
@@ -159,6 +167,7 @@ function FeedPage() {
 	}, []);
 
 	useEffect(() => {
+		// Only show private projects to followers.
 		if (!auth.currentUser?.uid) {
 			setFollowingSet(new Set());
 			return;
@@ -198,6 +207,7 @@ function FeedPage() {
 	}, [userProjects, privacyByUserId, followingSet]);
 
 	const handleComment = async (projectId, text) => {
+		// Write comments to the project subcollection.
 		if (!auth.currentUser) return;
 		await addDoc(collection(db, "projects", projectId, "comments"), {
 			content: text,
@@ -208,6 +218,7 @@ function FeedPage() {
 	};
 
 	const handleCollab = async (project) => {
+		// Store a simple collaboration request record.
 		if (!auth.currentUser) {
 			window.alert("Please log in first.");
 			return;

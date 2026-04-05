@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Keep React state aligned with Firebase auth.
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
@@ -26,6 +27,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = async ({ email, password, displayName }) => {
+    // Create the auth account first, then mirror profile data in Firestore.
     const credential = await createUserWithEmailAndPassword(auth, email, password);
 
     if (displayName) {
@@ -53,6 +55,7 @@ export function AuthProvider({ children }) {
   };
 
   const login = async ({ email, password }) => {
+    // Refresh the Firestore profile on sign-in.
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
     await setDoc(
@@ -72,6 +75,7 @@ export function AuthProvider({ children }) {
     return credential.user;
   };
 
+  // Central logout helper for the app.
   const logout = () => signOut(auth);
 
   const value = useMemo(

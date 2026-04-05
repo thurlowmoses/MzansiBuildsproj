@@ -9,6 +9,7 @@ router = APIRouter()
 
 
 class UpdateProfileRequest(BaseModel):
+	# Profile fields the frontend can update.
 	displayName: str | None = None
 	bio: str | None = None
 	photoURL: str | None = None
@@ -17,6 +18,7 @@ class UpdateProfileRequest(BaseModel):
 
 @router.get("/me")
 def get_my_profile(user: CurrentUser = CurrentUserDep):
+	# Return the saved profile or a safe default.
 	db = get_firestore_client()
 	snapshot = db.collection("users").document(user.uid).get()
 
@@ -42,6 +44,7 @@ def get_my_profile(user: CurrentUser = CurrentUserDep):
 
 @router.patch("/me")
 def update_my_profile(payload: UpdateProfileRequest, user: CurrentUser = CurrentUserDep):
+	# Merge only the fields that were sent.
 	db = get_firestore_client()
 	updates = payload.model_dump(exclude_none=True)
 	updates_with_timestamp = {**updates, "updatedAt": firestore.SERVER_TIMESTAMP}

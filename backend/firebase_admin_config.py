@@ -9,6 +9,7 @@ from firebase_admin import auth, credentials, firestore
 @lru_cache
 def get_firebase_app() -> firebase_admin.App:
     """Initialize and return a singleton Firebase Admin app."""
+    # Prefer an already-initialized app when available.
     try:
         return firebase_admin.get_app()
     except ValueError:
@@ -16,6 +17,7 @@ def get_firebase_app() -> firebase_admin.App:
         project_id = os.getenv("FIREBASE_PROJECT_ID")
 
         if cred_path:
+            # Use a local service-account file when provided.
             credential_file = Path(cred_path)
             if not credential_file.exists():
                 raise RuntimeError(
@@ -27,6 +29,7 @@ def get_firebase_app() -> firebase_admin.App:
             return firebase_admin.initialize_app(cred, {"projectId": project_id} if project_id else None)
 
         try:
+            # Fall back to Application Default Credentials.
             cred = credentials.ApplicationDefault()
             return firebase_admin.initialize_app(cred, {"projectId": project_id} if project_id else None)
         except Exception as exc:
@@ -38,10 +41,12 @@ def get_firebase_app() -> firebase_admin.App:
 
 @lru_cache
 def get_firestore_client() -> firestore.Client:
+    # Client setup stays cached for the whole process.
     get_firebase_app()
     return firestore.client()
 
 
 def verify_firebase_token(id_token: str) -> dict:
+    # Firebase Admin handles signature and expiry checks.
     get_firebase_app()
     return auth.verify_id_token(id_token)

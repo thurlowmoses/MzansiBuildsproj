@@ -21,6 +21,7 @@ function HelpPage() {
   const canAsk = useMemo(() => question.trim().length > 0, [question]);
 
   const askQuestion = (text) => {
+	// Append the prompt and the assistant reply together.
     const cleaned = text.trim();
     if (!cleaned) {
       return;
@@ -62,6 +63,7 @@ function HelpPage() {
         </header>
 
         <section className="help-suggestions">
+          {/* One-tap prompts. */}
           {suggestedQuestions.map((item) => (
             <button key={item} type="button" onClick={() => askQuestion(item)}>
               {item}
@@ -70,6 +72,7 @@ function HelpPage() {
         </section>
 
         <section className="help-chat" aria-live="polite">
+          {/* Conversation history. */}
           {history.map((entry, index) => (
             <article
               key={`${entry.role}-${index}`}
@@ -91,6 +94,7 @@ function HelpPage() {
         </section>
 
         <form className="help-form" onSubmit={onSubmit}>
+          {/* Freeform question input. */}
           <label htmlFor="help-question">Ask a question</label>
           <textarea
             id="help-question"

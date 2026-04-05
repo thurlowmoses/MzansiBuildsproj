@@ -7,12 +7,14 @@ from firebase_admin_config import verify_firebase_token
 
 @dataclass
 class CurrentUser:
+    # Minimal identity extracted from Firebase.
     uid: str
     email: str | None
     name: str | None
 
 
 def _parse_bearer_token(authorization: str | None) -> str:
+    # Reject missing or malformed auth headers early.
     if not authorization:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -37,6 +39,7 @@ def _parse_bearer_token(authorization: str | None) -> str:
 
 
 def get_current_user(authorization: str | None = Header(default=None)) -> CurrentUser:
+    # Verify the Firebase token and expose a small user object.
     token = _parse_bearer_token(authorization)
 
     try:
