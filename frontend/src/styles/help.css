@@ -46,6 +46,21 @@
   background: rgba(16, 185, 129, 0.22);
 }
 
+.help-examples {
+  display: grid;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border-radius: 16px;
+  background: #0f1723;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.help-examples h2 {
+  margin: 0;
+  color: #f5fbff;
+  font-size: 1rem;
+}
+
 .help-chat {
   display: grid;
   gap: var(--spacing-sm);
@@ -126,4 +141,41 @@
 .help-form button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.code-block {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: #0b121b;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #b4c7da;
+  font-size: 12px;
+}
+
+.code-block-pre {
+  margin: 0;
+  overflow-x: auto;
+  color: #e9f5ff;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.code-block-copy {
+  justify-self: start;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.12);
+  color: #c9fbe5;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
 }

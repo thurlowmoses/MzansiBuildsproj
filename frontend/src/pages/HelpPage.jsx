@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import CodeBlock from "../components/CodeBlock";
 import { getHelpResponse, suggestedQuestions } from "../utils/helpAssistant";
 import "../styles/help.css";
 
@@ -69,6 +70,29 @@ function HelpPage() {
               {item}
             </button>
           ))}
+        </section>
+
+        <section className="help-examples">
+          <h2>Quick examples</h2>
+          <CodeBlock
+            title="Create a project"
+            language="jsx"
+            code={`await addDoc(collection(db, "projects"), {
+  title: "MzansiBuilds",
+  description: "A platform for developers building in public.",
+  createdAt: serverTimestamp(),
+});`}
+          />
+          <CodeBlock
+            title="Send a collaboration request"
+            language="jsx"
+            code={`await addDoc(collection(db, "collabRequests"), {
+  projectId: project.id,
+  fromUserId: user.uid,
+  message: "I can help with the frontend.",
+  status: "pending",
+});`}
+          />
         </section>
 
         <section className="help-chat" aria-live="polite">
