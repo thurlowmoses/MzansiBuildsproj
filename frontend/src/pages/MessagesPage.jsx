@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -13,8 +15,17 @@ import { db } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/messages.css";
 
+function formatTimeLabel(timestamp) {
+  const seconds = timestamp?.seconds;
+  if (!seconds) return "now";
+
+  const date = new Date(seconds * 1000);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
 function MessagesPage() {
   const { user } = useAuth();
+  const location = useLocation();
   const [developers, setDevelopers] = useState([]);
   const [chats, setChats] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -22,6 +33,16 @@ function MessagesPage() {
   const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [followingSet, setFollowingSet] = useState(new Set());
+  const [followerCounts, setFollowerCounts] = useState({});
+  const [showAccountPreview, setShowAccountPreview] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q") || "";
+    setSearchText(q);
+  }, [location.search]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
@@ -33,16 +54,49 @@ function MessagesPage() {
             name: row.displayName || row.email || "Developer",
             email: row.email || "",
             bio: row.bio || "Building in public",
+            isPrivate: Boolean(row.isPrivate),
           };
         })
         .filter((row) => row.id && row.id !== user?.uid)
-        .slice(0, 24);
+        .slice(0, 120);
 
       setDevelopers(items);
     });
 
     return unsubscribe;
   }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setFollowingSet(new Set());
+      return;
+    }
+
+    const followsQuery = query(collection(db, "follows"), where("followerId", "==", user.uid));
+
+    const unsubscribe = onSnapshot(followsQuery, (snapshot) => {
+      const nextSet = new Set(snapshot.docs.map((docItem) => (docItem.data() || {}).followingId).filter(Boolean));
+      setFollowingSet(nextSet);
+    });
+
+    return unsubscribe;
+  }, [user?.uid]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "follows"), (snapshot) => {
+      const counts = {};
+
+      snapshot.docs.forEach((docItem) => {
+        const row = docItem.data() || {};
+        if (!row.followingId) return;
+        counts[row.followingId] = (counts[row.followingId] || 0) + 1;
+      });
+
+      setFollowerCounts(counts);
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -99,16 +153,72 @@ function MessagesPage() {
     return unsubscribe;
   }, [selectedChatId]);
 
-  const selectedUser = useMemo(
-    () => developers.find((developer) => developer.id === selectedUserId) || null,
-    [developers, selectedUserId]
-  );
+  const developersById = useMemo(() => {
+    const map = {};
+    developers.forEach((developer) => {
+      map[developer.id] = developer;
+    });
+    return map;
+  }, [developers]);
+
+  const selectedUser = useMemo(() => {
+    if (!selectedUserId) return null;
+    return developersById[selectedUserId] || null;
+  }, [developersById, selectedUserId]);
+
+  const filteredDevelopers = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+    if (!keyword) return developers;
+
+    return developers.filter((developer) => {
+      const haystack = `${developer.name} ${developer.email} ${developer.bio}`.toLowerCase();
+      return haystack.includes(keyword);
+    });
+  }, [developers, searchText]);
+
+  const conversationRows = useMemo(() => {
+    return chats
+      .map((chat) => {
+        const participants = Array.isArray(chat.participants) ? chat.participants : [];
+        const peerId = participants.find((id) => id !== user?.uid);
+
+        if (!peerId) return null;
+
+        const peer = developersById[peerId];
+        const fallbackName = Array.isArray(chat.participantNames)
+          ? chat.participantNames.find((name) => name && name !== (user?.displayName || user?.email || "Developer"))
+          : "Developer";
+
+        return {
+          chatId: chat.id,
+          peerId,
+          name: peer?.name || fallbackName || "Developer",
+          lastMessage: chat.lastMessage || "Start a conversation",
+          updatedAt: chat.updatedAt,
+        };
+      })
+      .filter(Boolean);
+  }, [chats, developersById, user?.uid, user?.displayName, user?.email]);
+
+  const canMessage = (developer) => !developer?.isPrivate || followingSet.has(developer.id);
+
+  const openConversation = (chatId, peerId) => {
+    setSelectedUserId(peerId);
+    setSelectedChatId(chatId);
+    setShowAccountPreview(false);
+  };
 
   const openChatWithDeveloper = (developerId) => {
-    setSelectedUserId(developerId);
+    const target = developersById[developerId];
+    if (target && !canMessage(target)) {
+      return;
+    }
 
-    const existing = chats.find((chat) =>
-      Array.isArray(chat.participants) && chat.participants.includes(developerId)
+    setSelectedUserId(developerId);
+    setShowAccountPreview(false);
+
+    const existing = chats.find(
+      (chat) => Array.isArray(chat.participants) && chat.participants.includes(developerId)
     );
 
     if (existing) {
@@ -116,6 +226,23 @@ function MessagesPage() {
     } else {
       setSelectedChatId("");
     }
+  };
+
+  const toggleFollow = async (developerId) => {
+    if (!user?.uid) return;
+
+    const relationshipId = `${user.uid}_${developerId}`;
+
+    if (followingSet.has(developerId)) {
+      await deleteDoc(doc(db, "follows", relationshipId));
+      return;
+    }
+
+    await setDoc(doc(db, "follows", relationshipId), {
+      followerId: user.uid,
+      followingId: developerId,
+      createdAt: serverTimestamp(),
+    });
   };
 
   const onSend = async () => {
@@ -164,41 +291,124 @@ function MessagesPage() {
     <main>
       <section className="messages-layout">
         <aside className="messages-sidebar">
-          <h1>Direct messages</h1>
-          <p>See what developers are currently building and reach out to collaborate.</p>
+          <div className="messages-inbox-header">
+            <h1>{user?.displayName || "Inbox"}</h1>
+            <p>Direct messages</p>
+          </div>
 
-          <div className="developer-list">
-            {developers.map((developer) => (
+          <input
+            type="text"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            className="developer-search"
+            placeholder="Search developers"
+          />
+
+          <div className="conversation-list">
+            {conversationRows.map((row) => (
               <button
-                key={developer.id}
+                key={row.chatId}
                 type="button"
-                className={`developer-item ${selectedUserId === developer.id ? "active" : ""}`}
-                onClick={() => openChatWithDeveloper(developer.id)}
+                className={`conversation-item ${selectedChatId === row.chatId ? "active" : ""}`}
+                onClick={() => openConversation(row.chatId, row.peerId)}
               >
-                <span className="developer-avatar">{developer.name.charAt(0).toUpperCase()}</span>
-                <span className="developer-meta">
-                  <strong>{developer.name}</strong>
-                  <small>{developer.bio}</small>
+                <span className="conversation-avatar">{row.name.charAt(0).toUpperCase()}</span>
+                <span className="conversation-meta">
+                  <strong>{row.name}</strong>
+                  <small>{row.lastMessage}</small>
                 </span>
+                <span className="conversation-time">{formatTimeLabel(row.updatedAt)}</span>
               </button>
             ))}
+          </div>
+
+          <p className="developer-section-label">Discover developers</p>
+          <div className="developer-list">
+            {filteredDevelopers.map((developer) => {
+              const followed = followingSet.has(developer.id);
+              const locked = developer.isPrivate && !followed;
+
+              return (
+                <div
+                  key={developer.id}
+                  className={`developer-item ${selectedUserId === developer.id ? "active" : ""} ${locked ? "locked" : ""}`}
+                  onClick={() => openChatWithDeveloper(developer.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openChatWithDeveloper(developer.id);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className="developer-avatar">{developer.name.charAt(0).toUpperCase()}</span>
+                  <span className="developer-meta">
+                    <strong>
+                      {developer.name}
+                      {developer.isPrivate ? <span className="private-pill">Private</span> : null}
+                    </strong>
+                    <small>
+                      {(followerCounts[developer.id] || 0).toLocaleString()} followers
+                      {locked ? " • Follow to view developer activity" : ` • ${developer.bio}`}
+                    </small>
+                  </span>
+                  <div className="developer-actions">
+                    <button
+                      type="button"
+                      className={`follow-btn ${followed ? "following" : ""}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleFollow(developer.id);
+                      }}
+                    >
+                      {followed ? "Following" : "Follow"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </aside>
 
         <div className="messages-thread">
           <header className="thread-header">
             {selectedUser ? (
-              <>
-                <h2>{selectedUser.name}</h2>
-                <p>Start a conversation and offer help on their project.</p>
-              </>
+              <div className="thread-head-main">
+                <div>
+                  <h2>{selectedUser.name}</h2>
+                  <p>
+                    {(followerCounts[selectedUser.id] || 0).toLocaleString()} followers • {selectedUser.isPrivate ? "Private account" : "Public account"}
+                  </p>
+                </div>
+                <div className="thread-head-actions">
+                  <button
+                    type="button"
+                    className="view-account-btn"
+                    onClick={() => setShowAccountPreview((current) => !current)}
+                  >
+                    {showAccountPreview ? "Hide account" : "View account"}
+                  </button>
+                </div>
+              </div>
             ) : (
               <>
-                <h2>Select a developer</h2>
-                <p>Pick someone from the left to send a direct message.</p>
+                <h2>Select a conversation</h2>
+                <p>Choose a chat from the inbox or start one with a developer.</p>
               </>
             )}
           </header>
+
+          {selectedUser && showAccountPreview ? (
+            <section className="account-preview-card" aria-label="Selected developer account preview">
+              <h3>{selectedUser.name}</h3>
+              <p>{selectedUser.email || "No public email"}</p>
+              <p>{selectedUser.bio || "No bio added yet."}</p>
+              <small>
+                {(followerCounts[selectedUser.id] || 0).toLocaleString()} followers • {selectedUser.isPrivate ? "Private account" : "Public account"}
+              </small>
+            </section>
+          ) : null}
 
           <div className="thread-messages">
             {messages.length > 0 ? (
@@ -207,12 +417,12 @@ function MessagesPage() {
                 return (
                   <article key={message.id} className={`bubble ${mine ? "mine" : "theirs"}`}>
                     <p>{message.text}</p>
-                    <small>{message.senderName || "Developer"}</small>
+                    <small>{formatTimeLabel(message.createdAt)}</small>
                   </article>
                 );
               })
             ) : (
-              <p className="thread-empty">No messages yet. Say hello and ask what they are building.</p>
+              <p className="thread-empty">No messages yet. Start with a quick intro and what you can help with.</p>
             )}
           </div>
 
@@ -221,11 +431,18 @@ function MessagesPage() {
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder={selectedUser ? `Message ${selectedUser.name}` : "Select a developer first"}
-              disabled={!selectedUser || sending}
+              disabled={!selectedUser || sending || !canMessage(selectedUser)}
             />
-            <button type="button" onClick={onSend} disabled={!selectedUser || sending || !draft.trim()}>
-              {sending ? "Sending..." : "Send message"}
+            <button
+              type="button"
+              onClick={onSend}
+              disabled={!selectedUser || sending || !draft.trim() || !canMessage(selectedUser)}
+            >
+              {sending ? "Sending..." : "Send"}
             </button>
+            {selectedUser && !canMessage(selectedUser) ? (
+              <p className="thread-private-note">This account is private. Follow first to message and view activity.</p>
+            ) : null}
           </div>
         </div>
       </section>

@@ -29,6 +29,84 @@
   margin-bottom: var(--spacing-md);
 }
 
+.messages-inbox-header {
+  margin-bottom: var(--spacing-sm);
+}
+
+.conversation-list {
+  display: grid;
+  gap: 8px;
+  margin-bottom: var(--spacing-md);
+}
+
+.conversation-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  text-align: left;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #e6edf8;
+  padding: 10px;
+}
+
+.conversation-item:hover,
+.conversation-item.active {
+  border-color: rgba(16, 185, 129, 0.75);
+  background: rgba(16, 185, 129, 0.11);
+}
+
+.conversation-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  background: linear-gradient(130deg, #0ea5a5, #10b981);
+  color: #072114;
+}
+
+.conversation-meta {
+  min-width: 0;
+  display: grid;
+}
+
+.conversation-meta strong {
+  color: #f8fbff;
+}
+
+.conversation-meta small {
+  color: #a7b9cf;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-time {
+  color: #8ea6c3;
+  font-size: 11px;
+}
+
+.developer-section-label {
+  margin: 0 0 8px;
+  color: #a9b9ce;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.developer-search {
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+  background: #0e1521;
+  color: #f2f7ff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
 .developer-list {
   display: grid;
   gap: var(--spacing-sm);
@@ -44,6 +122,10 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #d6dde8;
   padding: 10px 12px;
+}
+
+.developer-item.locked {
+  border-style: dashed;
 }
 
 .developer-item.active,
@@ -72,8 +154,38 @@
   color: #f8fbff;
 }
 
+.private-pill {
+  margin-left: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #ffd089;
+  border: 1px solid rgba(255, 208, 137, 0.6);
+  border-radius: 999px;
+  padding: 1px 6px;
+}
+
 .developer-meta small {
   color: #9ab0c9;
+}
+
+.developer-actions {
+  margin-left: auto;
+}
+
+.follow-btn {
+  border: 1px solid rgba(16, 185, 129, 0.65);
+  background: rgba(16, 185, 129, 0.13);
+  color: #a8f7d5;
+  font-size: 12px;
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.follow-btn.following {
+  border-color: rgba(148, 163, 184, 0.65);
+  background: rgba(148, 163, 184, 0.15);
+  color: #d6dfeb;
 }
 
 .messages-thread {
@@ -90,6 +202,57 @@
 
 .thread-header p {
   color: #9ab0c9;
+}
+
+.thread-head-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.thread-head-actions {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.view-account-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  background: rgba(16, 185, 129, 0.12);
+  color: #b9f8df;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.view-account-btn:hover {
+  border-color: rgba(16, 185, 129, 0.9);
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.account-preview-card {
+  margin-top: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+}
+
+.account-preview-card h3 {
+  margin: 0;
+  color: #f8fbff;
+}
+
+.account-preview-card p {
+  margin: 8px 0 0;
+  color: #aac0d7;
+}
+
+.account-preview-card small {
+  display: block;
+  margin-top: 8px;
+  color: #93a9c2;
 }
 
 .thread-messages {
@@ -156,6 +319,12 @@
 .thread-compose button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.thread-private-note {
+  margin: 0;
+  font-size: 12px;
+  color: #f8be83;
 }
 
 @media (max-width: 960px) {
