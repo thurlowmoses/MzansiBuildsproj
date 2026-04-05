@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { collection, limit, onSnapshot, query } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import { db } from "../firebase_config";
@@ -62,11 +62,21 @@ function IconHelp() {
   );
 }
 
+function IconCompass() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm3.9 5.8-5.6 2.4a1 1 0 0 0-.5.5l-2.4 5.6a.75.75 0 0 0 1 .98l5.6-2.38a1 1 0 0 0 .5-.5l2.4-5.6a.75.75 0 0 0-.98-1Zm-3.25 3.96a1.2 1.2 0 1 1-1.7 1.7 1.2 1.2 0 0 1 1.7-1.7Z" />
+    </svg>
+  );
+}
+
 function Navbar() {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [activePeople, setActivePeople] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!user) {
@@ -98,6 +108,18 @@ function Navbar() {
 
   const messageCount = useMemo(() => Math.min(activePeople.length, 9), [activePeople.length]);
 
+  const onSearchSubmit = (event) => {
+    event.preventDefault();
+
+    const trimmed = searchQuery.trim();
+    if (!trimmed) {
+      navigate("/messages");
+      return;
+    }
+
+    navigate(`/messages?q=${encodeURIComponent(trimmed)}`);
+  };
+
   if (location.pathname === "/auth") {
     return null;
   }
@@ -116,9 +138,15 @@ function Navbar() {
         </NavLink>
 
         {/* Center: Search */}
-        <div className="navbar-search">
-          <input type="text" placeholder="Search coming soon" disabled />
-        </div>
+        <form className="navbar-search" onSubmit={onSearchSubmit}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search developers"
+            aria-label="Search developers"
+          />
+        </form>
 
         {/* Right: Icons */}
         <div className="navbar-icons">
@@ -142,6 +170,10 @@ function Navbar() {
           <NavLink to="/celebration-wall" className="nav-icon" title="Celebrations">
             <IconSpark />
             <span className="sr-only">Celebrations</span>
+          </NavLink>
+          <NavLink to="/discovery" className="nav-icon" title="GitHub discovery">
+            <IconCompass />
+            <span className="sr-only">GitHub discovery</span>
           </NavLink>
           <NavLink to="/help" className="nav-icon" title="Help assistant">
             <IconHelp />

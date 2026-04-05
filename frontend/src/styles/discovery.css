@@ -1,0 +1,36 @@
+.discovery-page {
+  min-height: 100vh;
+  color: #f4f8ff;
+  background: radial-gradient(circle at 5% -10%, #162a3f 0, #0b1220 42%, #070d16 80%);
+  padding: 24px 16px 40px;
+}
+
+.discovery-container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.discovery-header {
+  margin-bottom: 18px;
+}
+
+.discovery-header h1 {
+  margin: 0;
+  color: #f2f8ff;
+  font-size: 1.85rem;
+}
+
+.discovery-header p {
+  margin: 8px 0 0;
+  color: #95afcb;
+}
+
+.discovery-note {
+  margin: 0 0 12px;
+  color: #9db4ce;
+}
+
+.discovery-error {
+  margin: 0 0 12px;
+  color: #ff9aa2;
+}

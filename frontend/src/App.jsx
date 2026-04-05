@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
 import AuthPage from "./pages/AuthPage";
 import CelebrationWall from "./pages/CelebrationWall";
+import DiscoveryPage from "./pages/DiscoveryPage";
 import FeedPage from "./pages/FeedPage";
 import HelpPage from "./pages/HelpPage";
 import MessagesPage from "./pages/MessagesPage";
@@ -22,6 +23,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Navigate to="/feed" replace />} />
             <Route path="/feed" element={<FeedPage />} />
+            <Route path="/discovery" element={<DiscoveryPage />} />
             <Route path="/projects/new" element={<NewProjectPage />} />
             <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
             <Route path="/messages" element={<MessagesPage />} />
