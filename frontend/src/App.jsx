@@ -6,9 +6,9 @@ import AuthPage from "./pages/AuthPage";
 import CelebrationWall from "./pages/CelebrationWall";
 import DiscoveryPage from "./pages/DiscoveryPage";
 import FeedPage from "./pages/FeedPage";
-import HelpPage from "./pages/HelpPage";
-import MessagesPage from "./pages/MessagesPage";
+import LandingPage from "./pages/LandingPage";
 import NewProjectPage from "./pages/NewProjectPage";
+import ProfileDashboard from "./pages/ProfileDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 
@@ -18,19 +18,18 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
 
           {/* Protected app routes live behind auth. */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Navigate to="/feed" replace />} />
             <Route path="/feed" element={<FeedPage />} />
+            <Route path="/dashboard" element={<ProfileDashboard />} />
             <Route path="/discovery" element={<DiscoveryPage />} />
             <Route path="/projects/new" element={<NewProjectPage />} />
-            <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
-            <Route path="/messages" element={<MessagesPage />} />
-            <Route path="/help" element={<HelpPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/celebration-wall" element={<CelebrationWall />} />
+            <Route path="/celebration" element={<CelebrationWall />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { createProject } from "../api/backendClient";
+import { storage } from "../firebase_config";
+import { uploadImageFile } from "../utils/imageUpload";
 import "../styles/newproject.css";
 
 const NewProjectPage = () => {
@@ -20,6 +22,8 @@ const NewProjectPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
+  const [codeImageFile, setCodeImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -44,12 +48,23 @@ const NewProjectPage = () => {
         .map((t) => t.trim())
         .filter((t) => t);
 
+      let codeImageUrl = "";
+      if (codeImageFile) {
+        codeImageUrl = await uploadImageFile({
+          file: codeImageFile,
+          storage,
+          pathPrefix: `project-code-images/${user.uid}`,
+        });
+      }
+
       await createProject({
         title: formData.title,
         description: formData.description,
         techStack: techArray,
         stage: formData.stage,
         supportNeeded: formData.supportNeeded,
+        codeImageUrl,
+        userPhotoURL: user.photoURL || "",
       });
 
       // Redirect to feed after backend saves the project
@@ -136,6 +151,22 @@ const NewProjectPage = () => {
               placeholder="e.g. Looking for a frontend developer, need feedback on my API..."
               rows={3}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="codeImage">Code screenshot (optional)</label>
+            <input
+              id="codeImage"
+              name="codeImage"
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setCodeImageFile(file);
+                setImagePreview(file ? URL.createObjectURL(file) : "");
+              }}
+            />
+            {imagePreview ? <img src={imagePreview} alt="Code preview" className="code-image-preview" /> : null}
           </div>
 
           {error && <p className="np-error">{error}</p>}

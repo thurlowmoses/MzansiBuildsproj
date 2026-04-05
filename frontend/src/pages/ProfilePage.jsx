@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { fetchMyProfile, updateMyProfile } from "../api/backendClient";
-import { auth, db } from "../firebase_config";
+import { auth, db, storage } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
+import { uploadImageFile } from "../utils/imageUpload";
 import "../styles/profile.css";
 
 function ProfilePage() {
@@ -13,6 +14,7 @@ function ProfilePage() {
 		displayName: "",
 		bio: "",
 		isPrivate: false,
+		photoURL: "",
 	});
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
@@ -20,6 +22,9 @@ function ProfilePage() {
 	const [successMessage, setSuccessMessage] = useState("");
 	const [followersCount, setFollowersCount] = useState(0);
 	const [followingCount, setFollowingCount] = useState(0);
+	const [photoFile, setPhotoFile] = useState(null);
+	const [uploadingPhoto, setUploadingPhoto] = useState(false);
+	const [followNotifications, setFollowNotifications] = useState([]);
 
 	useEffect(() => {
 	               // Load the current profile once auth is ready.
@@ -33,6 +38,7 @@ function ProfilePage() {
 					displayName: profile.displayName || user.displayName || "",
 					bio: profile.bio || "",
 					isPrivate: Boolean(profile.isPrivate),
+					photoURL: profile.photoURL || user.photoURL || "",
 				});
 			} catch (error) {
 				setErrorMessage(error.message || "Could not load profile.");
@@ -69,6 +75,27 @@ function ProfilePage() {
 		};
 	}, [user?.uid]);
 
+	useEffect(() => {
+		if (!user?.uid) {
+			setFollowNotifications([]);
+			return;
+		}
+
+		const notificationsQuery = query(
+			collection(db, "notifications"),
+			where("recipientId", "==", user.uid),
+			where("type", "==", "follow")
+		);
+
+		const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
+			const items = snapshot.docs.map((docItem) => ({ id: docItem.id, ...(docItem.data() || {}) }));
+			items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+			setFollowNotifications(items);
+		});
+
+		return () => unsubscribe();
+	}, [user?.uid]);
+
 	const onChange = (event) => {
 	               // Support both text and checkbox fields.
 		const { name, value, type, checked } = event.target;
@@ -83,25 +110,58 @@ function ProfilePage() {
 
 		try {
 			setSaving(true);
+			setUploadingPhoto(Boolean(photoFile));
 			setErrorMessage("");
 			setSuccessMessage("");
 
+			let photoURL = formData.photoURL;
+			if (photoFile) {
+				photoURL = await uploadImageFile({
+					file: photoFile,
+					storage,
+					pathPrefix: `profile-photos/${user.uid}`,
+				});
+			}
+
 			await updateProfile(auth.currentUser, {
 				displayName: formData.displayName,
+				photoURL,
 			});
+			await auth.currentUser?.reload();
 
 			await updateMyProfile({
 				displayName: formData.displayName,
 				bio: formData.bio,
 				isPrivate: formData.isPrivate,
+				photoURL,
 			});
+
+			await setDoc(
+				doc(db, "users", user.uid),
+				{
+					displayName: formData.displayName,
+					bio: formData.bio,
+					isPrivate: formData.isPrivate,
+					photoURL,
+					updatedAt: serverTimestamp(),
+				},
+				{ merge: true }
+			);
+
+			setFormData((prev) => ({ ...prev, photoURL }));
+			setPhotoFile(null);
 
 			setSuccessMessage("Profile updated successfully.");
 		} catch (error) {
 			setErrorMessage(error.message || "Could not save profile.");
 		} finally {
+			setUploadingPhoto(false);
 			setSaving(false);
 		}
+	};
+
+	const markNotificationRead = async (notificationId) => {
+		await updateDoc(doc(db, "notifications", notificationId), { isRead: true, readAt: serverTimestamp() });
 	};
 
 	if (loading) {
@@ -118,7 +178,11 @@ function ProfilePage() {
 		<main>
 			<section className="profile-container">
 				<header className="profile-header">
-					<div className="profile-avatar">{formData.displayName?.charAt(0)?.toUpperCase() || "D"}</div>
+					{formData.photoURL ? (
+						<img src={formData.photoURL} alt="Profile" className="profile-avatar-img" />
+					) : (
+						<div className="profile-avatar">{formData.displayName?.charAt(0)?.toUpperCase() || "D"}</div>
+					)}
 					<h1>My Profile</h1>
 					<p>Manage your account details and tell people what you're building.</p>
 				</header>
@@ -143,6 +207,17 @@ function ProfilePage() {
 				</div>
 
 				<form className="profile-form" onSubmit={onSubmit}>
+					<div className="profile-form-group">
+						<label htmlFor="photo">Profile picture</label>
+						<input
+							id="photo"
+							type="file"
+							accept="image/*"
+							onChange={(event) => setPhotoFile(event.target.files?.[0] || null)}
+						/>
+						<p className="profile-privacy-note">Upload a photo to personalize your profile.</p>
+					</div>
+
 					<div className="profile-form-group">
 						<label htmlFor="displayName">Display Name</label>
 						<input
@@ -182,13 +257,31 @@ function ProfilePage() {
 						When private, only you and followers can see your project activity.
 					</p>
 
-					<button className="profile-button" type="submit" disabled={saving}>
-						{saving ? "Saving..." : "Save Profile"}
+					<button className="profile-button" type="submit" disabled={saving || uploadingPhoto}>
+						{saving || uploadingPhoto ? "Saving..." : "Save Profile"}
 					</button>
 
 					{errorMessage && <p className="error-message">{errorMessage}</p>}
 					{successMessage && <p className="success-message">{successMessage}</p>}
 				</form>
+
+				<section className="profile-notifications">
+					<h2>Follow notifications</h2>
+					{followNotifications.length === 0 ? <p>No new follows yet.</p> : null}
+					{followNotifications.map((notification) => (
+						<article key={notification.id} className="notification-item">
+							<div>
+								<p>{notification.message || "Someone followed you."}</p>
+								<small>{notification.isRead ? "Read" : "Unread"}</small>
+							</div>
+							{!notification.isRead ? (
+								<button type="button" onClick={() => markNotificationRead(notification.id)}>
+									Mark read
+								</button>
+							) : null}
+						</article>
+					))}
+				</section>
 			</section>
 		</main>
 	);

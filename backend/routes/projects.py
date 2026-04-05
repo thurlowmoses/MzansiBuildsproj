@@ -18,6 +18,8 @@ class ProjectCreateRequest(BaseModel):
 	techStack: list[str] = Field(default_factory=list)
 	stage: str = "idea"
 	supportNeeded: str = ""
+	codeImageUrl: str | None = None
+	userPhotoURL: str | None = None
 
 
 class ProjectUpdateRequest(BaseModel):
@@ -26,6 +28,7 @@ class ProjectUpdateRequest(BaseModel):
 	techStack: list[str] | None = None
 	stage: str | None = None
 	supportNeeded: str | None = None
+	codeImageUrl: str | None = None
 
 
 class CompletionRequest(BaseModel):
@@ -59,6 +62,8 @@ def create_project(payload: ProjectCreateRequest, user: CurrentUser = CurrentUse
 		"techStack": payload.techStack,
 		"stage": payload.stage,
 		"supportNeeded": payload.supportNeeded,
+		"codeImageUrl": payload.codeImageUrl,
+		"userPhotoURL": payload.userPhotoURL,
 		"userId": user.uid,
 		"userName": user.name or user.email or "Developer",
 		"completed": False,

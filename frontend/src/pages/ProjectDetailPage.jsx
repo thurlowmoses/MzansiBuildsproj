@@ -252,7 +252,7 @@ function ProjectDetailPage() {
 	const handleCompletionToggle = async () => {
 		if (!projectId || !project || !user) return;
 
-		const isOwner = project.userId === user.uid;
+		const isOwner = project.userId ? project.userId === user.uid : true;
 		if (!isOwner) {
 			setError("Only the project owner can change completion status.");
 			return;
@@ -303,6 +303,10 @@ function ProjectDetailPage() {
 
 						<p className="detail-description">{project.description}</p>
 
+						{project.codeImageUrl ? (
+							<img src={project.codeImageUrl} alt={`${project.title} code screenshot`} className="detail-code-image" />
+						) : null}
+
 						{Array.isArray(project.techStack) && project.techStack.length > 0 && (
 							<div className="detail-tags">
 								{project.techStack.map((tech) => (
@@ -322,7 +326,7 @@ function ProjectDetailPage() {
 							</p>
 							{project.completed && <p className="detail-success">This project is on the Celebration Wall.</p>}
 
-							{user?.uid === project.userId && (
+							{(!project.userId || user?.uid === project.userId) && (
 								<button
 									type="button"
 									className="completion-button"

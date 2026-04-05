@@ -38,6 +38,15 @@
   color: #d1d5db;
 }
 
+.detail-code-image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+  margin: 0.5rem 0 0.75rem;
+}
+
 .detail-tags {
   display: flex;
   flex-wrap: wrap;

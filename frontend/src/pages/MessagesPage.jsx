@@ -253,6 +253,19 @@ function MessagesPage() {
       followingId: developerId,
       createdAt: serverTimestamp(),
     });
+
+    const followedDeveloper = developersById[developerId];
+    await addDoc(collection(db, "notifications"), {
+      type: "follow",
+      recipientId: developerId,
+      actorId: user.uid,
+      actorName: user.displayName || user.email || "Developer",
+      actorPhotoURL: user.photoURL || "",
+      message: `${user.displayName || user.email || "Developer"} started following you.`,
+      isRead: false,
+      createdAt: serverTimestamp(),
+      recipientName: followedDeveloper?.name || "Developer",
+    });
   };
 
   const onSend = async () => {

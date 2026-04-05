@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import {
 	addDoc,
 	collection,
+	doc,
 	onSnapshot,
 	orderBy,
 	query,
 	serverTimestamp,
+	updateDoc,
 	where,
 } from "firebase/firestore";
 import { auth, db } from "../firebase_config";
@@ -19,14 +21,16 @@ const STAGE_CLASS = {
 	completed: "stage-completed",
 };
 
-function ProjectCard({ project, onComment, onCollab, navigate }) {
+function ProjectCard({ project, onComment, onCollab, onToggleCompletion, navigate, currentUserId }) {
 	// Local state keeps the card self-contained.
 	const [comment, setComment] = useState("");
 	const [showComments, setShowComments] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
+	const [updatingCompletion, setUpdatingCompletion] = useState(false);
 
 	const stage = project.stage || "idea";
 	const stageClass = STAGE_CLASS[stage] || STAGE_CLASS.idea;
+	const isOwner = Boolean(currentUserId) && (project.userId === currentUserId || !project.userId);
 
 	const handleComment = async () => {
 		// Skip empty submissions.
@@ -39,11 +43,24 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 		setSubmitting(false);
 	};
 
+	const handleToggleCompletion = async () => {
+		try {
+			setUpdatingCompletion(true);
+			await onToggleCompletion(project);
+		} finally {
+			setUpdatingCompletion(false);
+		}
+	};
+
 	return (
 		<article className="project-card">
 			<header className="card-header">
 				{/* Owner and stage summary. */}
-				<div className="avatar">{(project.userName || "A")[0].toUpperCase()}</div>
+				{project.userPhotoURL ? (
+					<img src={project.userPhotoURL} alt={`${project.userName || "Developer"} profile`} className="avatar avatar-img" />
+				) : (
+					<div className="avatar">{(project.userName || "A")[0].toUpperCase()}</div>
+				)}
 				<div className="card-meta">
 					<p className="card-username">{project.userName || "Developer"}</p>
 					{project.isGitHub ? (
@@ -71,6 +88,10 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 
 				<p className="card-description">{project.description}</p>
 
+				{project.codeImageUrl ? (
+					<img src={project.codeImageUrl} alt={`${project.title} code screenshot`} className="card-code-image" />
+				) : null}
+
 				{Array.isArray(project.techStack) && project.techStack.length > 0 ? (
 					<div className="tech-stack">
 						{project.techStack.map((tech) => (
@@ -92,12 +113,29 @@ function ProjectCard({ project, onComment, onCollab, navigate }) {
 				<>
 					{/* Engagement actions. */}
 					<div className="card-actions">
+						<button type="button" className="action-btn" onClick={() => navigate(`/projects/${project.id}`)}>
+							View details
+						</button>
 						<button type="button" className="action-btn" onClick={() => setShowComments((prev) => !prev)}>
 							Comment
 						</button>
 						<button type="button" className="action-btn collab" onClick={() => onCollab(project)}>
 							Raise hand
 						</button>
+						{isOwner ? (
+							<button
+								type="button"
+								className="action-btn progress"
+								onClick={handleToggleCompletion}
+								disabled={updatingCompletion}
+							>
+								{updatingCompletion
+									? "Updating..."
+									: project.completed
+										? "Mark in progress"
+										: "Mark completed"}
+							</button>
+						) : null}
 					</div>
 
 					{showComments ? (
@@ -243,6 +281,26 @@ function FeedPage() {
 		window.alert("Collaboration request sent.");
 	};
 
+	const handleCompletionToggle = async (project) => {
+		if (!auth.currentUser?.uid) {
+			window.alert("Please log in first.");
+			return;
+		}
+
+		if (project.userId && project.userId !== auth.currentUser.uid) {
+			window.alert("Only the project owner can change completion status.");
+			return;
+		}
+
+		const markCompleted = !Boolean(project.completed);
+		await updateDoc(doc(db, "projects", project.id), {
+			completed: markCompleted,
+			stage: markCompleted ? "completed" : "building",
+			completedAt: markCompleted ? serverTimestamp() : null,
+			updatedAt: serverTimestamp(),
+		});
+	};
+
 	if (loadingUser) {
 		return (
 			<main className="feed-page">
@@ -266,7 +324,15 @@ function FeedPage() {
 					<p className="feed-section-label">From the community</p>
 					<section className="feed-list">
 						{visibleUserProjects.map((project) => (
-							<ProjectCard key={project.id} project={project} onComment={handleComment} onCollab={handleCollab} navigate={navigate} />
+							<ProjectCard
+								key={project.id}
+								project={project}
+								onComment={handleComment}
+								onCollab={handleCollab}
+								onToggleCompletion={handleCompletionToggle}
+								navigate={navigate}
+								currentUserId={auth.currentUser?.uid || ""}
+							/>
 						))}
 					</section>
 				</>

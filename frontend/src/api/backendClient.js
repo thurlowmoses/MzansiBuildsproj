@@ -4,6 +4,8 @@ const API_BASE = (
   import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000"
 ).replace(/\/$/, "");
 
+const REQUEST_TIMEOUT_MS = 15000;
+
 async function getIdTokenOrThrow() {
   const currentUser = auth.currentUser;
 
@@ -24,11 +26,25 @@ async function request(path, { method = "GET", body, requiresAuth = true } = {})
     headers.Authorization = `Bearer ${idToken}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("Request timed out. Make sure backend is running on port 8000.");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 
   const data = await response.json().catch(() => ({}));
 

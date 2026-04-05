@@ -121,7 +121,7 @@ function Navbar() {
     navigate(`/messages?q=${encodeURIComponent(trimmed)}`);
   };
 
-  if (location.pathname === "/auth") {
+  if (location.pathname === "/auth" || location.pathname === "/") {
     return null;
   }
 

@@ -102,6 +102,11 @@
   background: linear-gradient(130deg, #10b981, #22d3a2);
 }
 
+.avatar-img {
+  object-fit: cover;
+  background: transparent;
+}
+
 .card-meta {
   min-width: 0;
 }
@@ -186,6 +191,15 @@
   color: #c8d7e8;
 }
 
+.card-code-image {
+  margin-top: 12px;
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 .tech-stack {
   display: flex;
   flex-wrap: wrap;
@@ -237,6 +251,11 @@
 .action-btn.collab {
   border-color: rgba(147, 197, 253, 0.42);
   color: #bfdbfe;
+}
+
+.action-btn.progress {
+  border-color: rgba(16, 185, 129, 0.55);
+  color: #a8f7d5;
 }
 
 .comment-section {
