@@ -1,11 +1,14 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import CodeBlock from "../components/CodeBlock";
+import { streamHelpResponse } from "../api/backendClient";
 import { getHelpResponse, suggestedQuestions } from "../utils/helpAssistant";
 import "../styles/help.css";
 
 function HelpPage() {
+  const location = useLocation();
   const [question, setQuestion] = useState("");
+  const [asking, setAsking] = useState(false);
   const [history, setHistory] = useState([
     {
       role: "assistant",
@@ -19,9 +22,17 @@ function HelpPage() {
     },
   ]);
 
-  const canAsk = useMemo(() => question.trim().length > 0, [question]);
+  const canAsk = useMemo(() => question.trim().length > 0 && !asking, [question, asking]);
+useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const preset = params.get("question") || "";
+    if (preset) {
+      setQuestion(preset);
+    }
+  }, [location.search]);
 
-  const askQuestion = (text) => {
+  
+  const askQuestion = async (text) => {
 	// Append the prompt and the assistant reply together.
     const cleaned = text.trim();
     if (!cleaned) {
@@ -29,27 +40,60 @@ function HelpPage() {
     }
 
     const response = getHelpResponse(cleaned);
+    const assistantId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     setHistory((prev) => [
       ...prev,
       {
+        id: `${assistantId}_user`,
         role: "user",
         answer: cleaned,
       },
       {
+        id: assistantId,
         role: "assistant",
-        title: response.title,
-        answer: response.answer,
+        title: "Mzansi AI Help",
+        answer: "",
         actions: response.actions || [],
       },
     ]);
 
     setQuestion("");
+
+    try {
+      setAsking(true);
+      await streamHelpResponse(cleaned, (chunk) => {
+        setHistory((prev) =>
+          prev.map((entry) =>
+            entry.id === assistantId
+              ? {
+                  ...entry,
+                  answer: `${entry.answer || ""}${chunk}`,
+                }
+              : entry
+          )
+        );
+      });
+    } catch (error) {
+      setHistory((prev) =>
+        prev.map((entry) =>
+          entry.id === assistantId
+            ? {
+                ...entry,
+                title: response.title,
+                answer: response.answer,
+              }
+            : entry
+        )
+      );
+    } finally {
+      setAsking(false);
+    }
   };
 
   const onSubmit = (event) => {
     event.preventDefault();
-    askQuestion(question);
+    void askQuestion(question);
   };
 
   return (
@@ -66,7 +110,7 @@ function HelpPage() {
         <section className="help-suggestions">
           {/* One-tap prompts. */}
           {suggestedQuestions.map((item) => (
-            <button key={item} type="button" onClick={() => askQuestion(item)}>
+            <button key={item} type="button" onClick={() => void askQuestion(item)} disabled={asking}>
               {item}
             </button>
           ))}
@@ -99,7 +143,7 @@ function HelpPage() {
           {/* Conversation history. */}
           {history.map((entry, index) => (
             <article
-              key={`${entry.role}-${index}`}
+              key={entry.id || `${entry.role}-${index}`}
               className={`help-message ${entry.role === "assistant" ? "assistant" : "user"}`}
             >
               {entry.title ? <h2>{entry.title}</h2> : null}
@@ -127,7 +171,7 @@ function HelpPage() {
             placeholder="Example: How do I send a collaboration request?"
           />
           <button type="submit" disabled={!canAsk}>
-            Ask assistant
+            {asking ? "Thinking..." : "Ask assistant"}
           </button>
         </form>
       </section>

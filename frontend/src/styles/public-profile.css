@@ -1,0 +1,135 @@
+.public-profile-page {
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+  background: radial-gradient(circle at 5% -10%, #0b0b0b 0, #111111 38%, #000000 75%);
+  color: #f8fafc;
+}
+
+.public-profile-shell {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.public-profile-error {
+  color: #ef4444;
+}
+
+.public-profile-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(155deg, rgba(17, 24, 39, 0.9), rgba(11, 17, 28, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 18px;
+}
+
+.public-profile-avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(130deg, #10b981, #22c55e);
+  color: #032113;
+  font-weight: 800;
+  font-size: 1.8rem;
+}
+
+.public-profile-copy h1 {
+  margin: 0;
+  font-size: 1.85rem;
+}
+
+.public-profile-copy p {
+  margin: 8px 0 0;
+  color: #aac0d7;
+}
+
+.public-profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.public-profile-tags span {
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: #bbf7d0;
+  background: rgba(16, 185, 129, 0.08);
+  font-size: 0.82rem;
+}
+
+.public-profile-actions {
+  margin-top: 10px;
+}
+
+.public-profile-message-btn {
+  border: 1px solid rgba(16, 185, 129, 0.7);
+  background: rgba(16, 185, 129, 0.15);
+  color: #bbf7d0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.public-profile-message-btn:hover {
+  background: rgba(16, 185, 129, 0.24);
+}
+
+.public-profile-section {
+  margin-top: 18px;
+}
+
+.public-profile-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.public-profile-section-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.public-profile-section-head span {
+  color: #d1d5db;
+  font-size: 0.88rem;
+}
+
+.public-profile-empty {
+  color: #d1d5db;
+}
+
+.public-profile-struggles {
+  display: grid;
+  gap: 10px;
+}
+
+.public-profile-struggle-card {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 208, 137, 0.35);
+  background: rgba(255, 208, 137, 0.08);
+  color: #bbf7d0;
+  padding: 12px 14px;
+}
+
+@media (max-width: 720px) {
+  .public-profile-header {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .public-profile-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

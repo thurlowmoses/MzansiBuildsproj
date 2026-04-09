@@ -18,8 +18,6 @@ class ProjectCreateRequest(BaseModel):
 	techStack: list[str] = Field(default_factory=list)
 	stage: str = "idea"
 	supportNeeded: str = ""
-	codeImageUrl: str | None = None
-	userPhotoURL: str | None = None
 
 
 class ProjectUpdateRequest(BaseModel):
@@ -28,7 +26,6 @@ class ProjectUpdateRequest(BaseModel):
 	techStack: list[str] | None = None
 	stage: str | None = None
 	supportNeeded: str | None = None
-	codeImageUrl: str | None = None
 
 
 class CompletionRequest(BaseModel):
@@ -62,16 +59,31 @@ def create_project(payload: ProjectCreateRequest, user: CurrentUser = CurrentUse
 		"techStack": payload.techStack,
 		"stage": payload.stage,
 		"supportNeeded": payload.supportNeeded,
-		"codeImageUrl": payload.codeImageUrl,
-		"userPhotoURL": payload.userPhotoURL,
 		"userId": user.uid,
 		"userName": user.name or user.email or "Developer",
+		"commentCount": 0,
+		"collabCount": 0,
+		"milestoneDoneCount": 0,
 		"completed": False,
 		"createdAt": firestore.SERVER_TIMESTAMP,
 		"updatedAt": firestore.SERVER_TIMESTAMP,
 	}
 
 	ref.set(record)
+	db.collection("activities").document().set(
+		{
+			"type": "project_created",
+			"projectId": ref.id,
+			"projectTitle": payload.title,
+			"projectDescription": payload.description,
+			"projectStage": payload.stage,
+			"projectSupportNeeded": payload.supportNeeded,
+			"projectTechStack": payload.techStack,
+			"projectUserId": user.uid,
+			"projectUserName": user.name or user.email or "Developer",
+			"createdAt": firestore.SERVER_TIMESTAMP,
+		}
+	)
 	return {"id": ref.id, "message": "Project created"}
 
 
@@ -126,6 +138,35 @@ def update_project(project_id: str, payload: ProjectUpdateRequest, user: Current
 	return {"message": "Project updated", "id": project_id}
 
 
+def _delete_project_subcollection(db, project_id: str, collection_name: str) -> None:
+	collection_ref = db.collection("projects").document(project_id).collection(collection_name)
+	for snapshot in collection_ref.stream():
+		snapshot.reference.delete()
+
+
+@router.delete("/{project_id}")
+def delete_project(project_id: str, user: CurrentUser = CurrentUserDep):
+	# Only the owner can delete their project.
+	db = get_firestore_client()
+	snapshot = _get_project_or_404(project_id)
+	project = snapshot.to_dict() or {}
+
+	if project.get("userId") != user.uid:
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only owner can delete project")
+
+	for collection_name in ("comments", "milestones", "collaborationRequests"):
+		_delete_project_subcollection(db, project_id, collection_name)
+
+	for collection_name in ("activities", "notifications"):
+		query_ref = db.collection(collection_name).where("projectId", "==", project_id)
+		for item in query_ref.stream():
+			item.reference.delete()
+
+	db.collection("projects").document(project_id).delete()
+
+	return {"message": "Project deleted", "id": project_id}
+
+
 @router.post("/{project_id}/complete")
 def complete_project(project_id: str, payload: CompletionRequest, user: CurrentUser = CurrentUserDep):
 	# Completion status controls Celebration Wall visibility.
@@ -146,5 +187,21 @@ def complete_project(project_id: str, payload: CompletionRequest, user: CurrentU
 		},
 		merge=True,
 	)
+
+	if is_complete:
+		db.collection("activities").document().set(
+			{
+				"type": "project_completed",
+				"projectId": project_id,
+				"projectTitle": project.get("title", "Project"),
+				"projectDescription": project.get("description", ""),
+				"projectStage": "completed",
+				"projectSupportNeeded": project.get("supportNeeded", ""),
+				"projectTechStack": project.get("techStack", []),
+				"projectUserId": user.uid,
+				"projectUserName": user.name or user.email or "Developer",
+				"createdAt": firestore.SERVER_TIMESTAMP,
+			}
+		)
 
 	return {"message": "Project completion updated", "id": project_id, "completed": is_complete}

@@ -35,7 +35,8 @@ def get_firebase_app() -> firebase_admin.App:
         except Exception as exc:
             raise RuntimeError(
                 "Firebase Admin could not initialize. Set GOOGLE_APPLICATION_CREDENTIALS to a valid "
-                "service-account JSON file path, or configure Application Default Credentials."
+                "service-account JSON file path for the same Firebase project used by the frontend, "
+                "or configure Application Default Credentials."
             ) from exc
 
 
@@ -49,4 +50,4 @@ def get_firestore_client() -> firestore.Client:
 def verify_firebase_token(id_token: str) -> dict:
     # Firebase Admin handles signature and expiry checks.
     get_firebase_app()
-    return auth.verify_id_token(id_token)
+    return auth.verify_id_token(id_token, check_revoked=False, clock_skew_seconds=60)

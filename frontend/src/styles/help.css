@@ -13,18 +13,18 @@
   padding: var(--spacing-lg);
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 16px;
-  background: linear-gradient(155deg, #0f1723, #151f2f);
+  background: linear-gradient(155deg, #111111, #111111);
   color: #e8f2ff;
 }
 
 .help-header h1 {
   margin-bottom: var(--spacing-sm);
-  color: #f5fbff;
+  color: #f8fafc;
 }
 
 .help-header p {
   margin: 0;
-  color: #a6bdd6;
+  color: #d1d5db;
 }
 
 .help-suggestions {
@@ -51,13 +51,13 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-lg);
   border-radius: 16px;
-  background: #0f1723;
+  background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .help-examples h2 {
   margin: 0;
-  color: #f5fbff;
+  color: #f8fafc;
   font-size: 1rem;
 }
 
@@ -70,13 +70,13 @@
   padding: var(--spacing-md);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.13);
-  background: #111926;
+  background: #111111;
   color: #d9e6f5;
 }
 
 .help-message h2 {
   margin: 0 0 6px;
-  color: #f4fbff;
+  color: #f8fafc;
   font-size: 1rem;
 }
 
@@ -101,7 +101,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   padding: 6px 10px;
   text-decoration: none;
-  color: #def4ff;
+  color: #f8fafc;
 }
 
 .help-actions a:hover {
@@ -115,7 +115,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-lg);
   border-radius: 16px;
-  background: #101723;
+  background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
@@ -126,9 +126,9 @@
 
 .help-form textarea {
   min-height: 110px;
-  background: #0c131e;
+  background: #111111;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #eef7ff;
+  color: #f8fafc;
 }
 
 .help-form button {
@@ -165,7 +165,7 @@
 .code-block-pre {
   margin: 0;
   overflow-x: auto;
-  color: #e9f5ff;
+  color: #f8fafc;
   font-size: 13px;
   line-height: 1.6;
 }

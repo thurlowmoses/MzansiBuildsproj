@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from routes.posts import router as posts_router
 from routes.projects import router as projects_router
 from routes.users import router as users_router
+from routes.ai import router as ai_router
+from routes.feed import router as feed_router
 
 load_dotenv()
 
@@ -47,3 +49,5 @@ async def root():
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(projects_router, prefix="/projects", tags=["projects"])
 app.include_router(posts_router, tags=["posts"])
+app.include_router(ai_router, prefix="/ai", tags=["ai"])
+app.include_router(feed_router, prefix="/feed", tags=["feed"])

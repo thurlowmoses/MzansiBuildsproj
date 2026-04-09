@@ -8,7 +8,7 @@
 
 .messages-sidebar,
 .messages-thread {
-  background: #121a27;
+  background: #111111;
   border: 1px solid rgba(16, 185, 129, 0.22);
   border-radius: 18px;
   box-shadow: 0 20px 40px rgba(3, 8, 15, 0.45);
@@ -21,11 +21,11 @@
 
 .messages-sidebar h1 {
   margin-bottom: var(--spacing-sm);
-  color: #f8fbff;
+  color: #f8fafc;
 }
 
 .messages-sidebar p {
-  color: #9ab0c9;
+  color: #d1d5db;
   margin-bottom: var(--spacing-md);
 }
 
@@ -66,7 +66,7 @@
   display: inline-grid;
   place-items: center;
   font-weight: 700;
-  background: linear-gradient(130deg, #0ea5a5, #10b981);
+  background: linear-gradient(130deg, #16a34a, #10b981);
   color: #072114;
 }
 
@@ -76,24 +76,24 @@
 }
 
 .conversation-meta strong {
-  color: #f8fbff;
+  color: #f8fafc;
 }
 
 .conversation-meta small {
-  color: #a7b9cf;
+  color: #d1d5db;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .conversation-time {
-  color: #8ea6c3;
+  color: #d1d5db;
   font-size: 11px;
 }
 
 .developer-section-label {
   margin: 0 0 8px;
-  color: #a9b9ce;
+  color: #d1d5db;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -102,7 +102,7 @@
 .developer-search {
   width: 100%;
   margin-bottom: var(--spacing-sm);
-  background: #0e1521;
+  background: #111111;
   color: #f2f7ff;
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
@@ -141,7 +141,7 @@
   display: inline-grid;
   place-items: center;
   font-weight: 700;
-  background: linear-gradient(130deg, #10b981, #0ea5a5);
+  background: linear-gradient(130deg, #10b981, #16a34a);
   color: #072114;
 }
 
@@ -151,7 +151,7 @@
 }
 
 .developer-meta strong {
-  color: #f8fbff;
+  color: #f8fafc;
 }
 
 .private-pill {
@@ -159,14 +159,14 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: #ffd089;
+  color: #bbf7d0;
   border: 1px solid rgba(255, 208, 137, 0.6);
   border-radius: 999px;
   padding: 1px 6px;
 }
 
 .developer-meta small {
-  color: #9ab0c9;
+  color: #d1d5db;
 }
 
 .developer-actions {
@@ -176,7 +176,7 @@
 .follow-btn {
   border: 1px solid rgba(16, 185, 129, 0.65);
   background: rgba(16, 185, 129, 0.13);
-  color: #a8f7d5;
+  color: #bbf7d0;
   font-size: 12px;
   border-radius: 999px;
   padding: 5px 10px;
@@ -196,12 +196,12 @@
 }
 
 .thread-header h2 {
-  color: #f8fbff;
+  color: #f8fafc;
   margin-bottom: 6px;
 }
 
 .thread-header p {
-  color: #9ab0c9;
+  color: #d1d5db;
 }
 
 .thread-head-main {
@@ -220,7 +220,7 @@
   border-radius: 999px;
   border: 1px solid rgba(16, 185, 129, 0.6);
   background: rgba(16, 185, 129, 0.12);
-  color: #b9f8df;
+  color: #bbf7d0;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 700;
@@ -241,7 +241,7 @@
 
 .account-preview-card h3 {
   margin: 0;
-  color: #f8fbff;
+  color: #f8fafc;
 }
 
 .account-preview-card p {
@@ -252,7 +252,7 @@
 .account-preview-card small {
   display: block;
   margin-top: 8px;
-  color: #93a9c2;
+  color: #d1d5db;
 }
 
 .thread-messages {
@@ -277,7 +277,7 @@
 }
 
 .bubble small {
-  color: #8ea6c3;
+  color: #d1d5db;
 }
 
 .bubble.mine {
@@ -293,7 +293,7 @@
 }
 
 .thread-empty {
-  color: #9ab0c9;
+  color: #d1d5db;
 }
 
 .thread-compose {

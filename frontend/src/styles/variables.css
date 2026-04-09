@@ -1,23 +1,25 @@
 /* ====================================
    THEME VARIABLES - Color Scheme
    Green, White, Black theme for MzansiBuilds
+   Supports light and dark mode
    ==================================== */
 
 :root {
-  /* Primary Colors - Green & Black */
-  --color-primary: #10b981;      /* Emerald Green - Primary action */
-  --color-primary-dark: #059669; /* Darker green - Hover states */
-  --color-primary-light: #d1fae5; /* Light green - Backgrounds */
+  /* Primary Colors - Green */
+  --color-primary: #16a34a;
+  --color-primary-dark: #15803d;
+  --color-primary-light: #dcfce7;
 
-  /* Neutral Colors - White & Black */
-  --color-white: #ffffff;        /* Pure white - Backgrounds */
-  --color-black: #1f2937;        /* Dark gray/black - Text */
-  --color-gray-light: #f3f4f6;  /* Light gray - Secondary backgrounds */
-  --color-gray-medium: #d1d5db; /* Medium gray - Borders */
-  --color-gray-dark: #6b7280;   /* Dark gray - Secondary text */
+  /* Neutral Colors - Light Mode (default) */
+  --color-text: #111111;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f3f4f6;
+  --color-border: #d1d5db;
+  --color-text-secondary: #4b5563;
+  --color-bg-hover: #e5e7eb;
 
   /* Status Colors */
-  --color-success: #10b981;      /* Green - Success states */
+  --color-success: #16a34a;
   --color-error: #ef4444;        /* Red - Error states */
   --color-warning: #f59e0b;      /* Amber - Warning states */
   --color-info: #3b82f6;         /* Blue - Info states */
@@ -61,12 +63,24 @@
   --transition-slow: 500ms ease-in-out;
 }
 
-/* Dark mode support (optional for future) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-black: #f3f4f6;
-    --color-white: #1f2937;
-    --color-gray-light: #374151;
-    --color-gray-medium: #4b5563;
-  }
+/* Dark Mode */
+:root.dark-mode {
+  /* Neutral Colors - Dark Mode */
+  --color-text: #f8fafc;
+  --color-bg: #000000;
+  --color-bg-secondary: #111111;
+  --color-border: #2f2f2f;
+  --color-text-secondary: #d1d5db;
+  --color-bg-hover: #1a1a1a;
+}
+
+/* Light Mode (explicit) */
+:root.light-mode {
+  /* Neutral Colors - Light Mode */
+  --color-text: #111111;
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f3f4f6;
+  --color-border: #d1d5db;
+  --color-text-secondary: #4b5563;
+  --color-bg-hover: #e5e7eb;
 }

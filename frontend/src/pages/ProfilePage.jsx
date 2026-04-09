@@ -1,290 +1,571 @@
-import { useEffect, useState } from "react";
-import { collection, doc, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
-import { updateProfile } from "firebase/auth";
-import { fetchMyProfile, updateMyProfile } from "../api/backendClient";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { auth, db, storage } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
-import { uploadImageFile } from "../utils/imageUpload";
 import "../styles/profile.css";
 
-function ProfilePage() {
-	// Profile form mirrors the backend record.
-	const { user } = useAuth();
-	const [formData, setFormData] = useState({
-		displayName: "",
-		bio: "",
-		isPrivate: false,
-		photoURL: "",
-	});
-	const [loading, setLoading] = useState(true);
-	const [saving, setSaving] = useState(false);
-	const [errorMessage, setErrorMessage] = useState("");
-	const [successMessage, setSuccessMessage] = useState("");
-	const [followersCount, setFollowersCount] = useState(0);
-	const [followingCount, setFollowingCount] = useState(0);
-	const [photoFile, setPhotoFile] = useState(null);
-	const [uploadingPhoto, setUploadingPhoto] = useState(false);
-	const [followNotifications, setFollowNotifications] = useState([]);
+const ProfilePage = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-	useEffect(() => {
-	               // Load the current profile once auth is ready.
-		const loadProfile = async () => {
-			if (!user) return;
+  const [profile, setProfile] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [activeTab, setActiveTab] = useState("projects");
+  const [showMenu, setShowMenu] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [editing, setEditing] = useState(false);
 
-			try {
-				setLoading(true);
-				const profile = await fetchMyProfile();
-				setFormData({
-					displayName: profile.displayName || user.displayName || "",
-					bio: profile.bio || "",
-					isPrivate: Boolean(profile.isPrivate),
-					photoURL: profile.photoURL || user.photoURL || "",
-				});
-			} catch (error) {
-				setErrorMessage(error.message || "Could not load profile.");
-			} finally {
-				setLoading(false);
-			}
-		};
+  const [formData, setFormData] = useState({
+    name: "",
+    bio: "",
+    github: "",
+    skills: "",
+  });
 
-		loadProfile();
-	}, [user]);
+  const menuRef = useRef(null);
+  const followersRequestSeqRef = useRef(0);
+  const followingRequestSeqRef = useRef(0);
 
-	useEffect(() => {
-	               // Live follower counts keep the page useful.
-		if (!user?.uid) {
-			setFollowersCount(0);
-			setFollowingCount(0);
-			return;
-		}
+  useEffect(() => {
+    const handler = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
 
-		const followersQuery = query(collection(db, "follows"), where("followingId", "==", user.uid));
-		const followingQuery = query(collection(db, "follows"), where("followerId", "==", user.uid));
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-		const unsubFollowers = onSnapshot(followersQuery, (snapshot) => {
-			setFollowersCount(snapshot.size);
-		});
+  useEffect(() => {
+    if (!user?.uid) return;
 
-		const unsubFollowing = onSnapshot(followingQuery, (snapshot) => {
-			setFollowingCount(snapshot.size);
-		});
+    const unsubProfile = onSnapshot(doc(db, "users", user.uid), (snap) => {
+      const data = snap.exists() ? snap.data() : {};
+      setProfile(data);
+      setFormData({
+        name: data.name || user.displayName || "",
+        bio: data.bio || "",
+        github: data.github || "",
+        skills: Array.isArray(data.skills) ? data.skills.join(", ") : "",
+      });
+      setLoading(false);
+    });
 
-		return () => {
-			unsubFollowers();
-			unsubFollowing();
-		};
-	}, [user?.uid]);
+    return () => unsubProfile();
+  }, [user?.uid, user?.displayName]);
 
-	useEffect(() => {
-		if (!user?.uid) {
-			setFollowNotifications([]);
-			return;
-		}
+  useEffect(() => {
+    if (!user?.uid) return;
 
-		const notificationsQuery = query(
-			collection(db, "notifications"),
-			where("recipientId", "==", user.uid),
-			where("type", "==", "follow")
-		);
+    const projectQuery = query(
+      collection(db, "projects"),
+      where("userId", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
 
-		const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
-			const items = snapshot.docs.map((docItem) => ({ id: docItem.id, ...(docItem.data() || {}) }));
-			items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-			setFollowNotifications(items);
-		});
+    const unsubProjects = onSnapshot(projectQuery, (snap) => {
+      setProjects(snap.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() })));
+    });
 
-		return () => unsubscribe();
-	}, [user?.uid]);
+    return () => unsubProjects();
+  }, [user?.uid]);
 
-	const onChange = (event) => {
-	               // Support both text and checkbox fields.
-		const { name, value, type, checked } = event.target;
-		setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
-	};
+  const fetchUserProfiles = async (ids) => {
+    if (!ids.length) return [];
 
-	const onSubmit = async (event) => {
-	               // Persist the form and sync Firebase auth display name.
-		event.preventDefault();
+    const rows = await Promise.all(
+      ids.map(async (id) => {
+        const snap = await getDoc(doc(db, "users", id));
+        if (!snap.exists()) return null;
+        return { uid: id, ...snap.data() };
+      })
+    );
 
-		if (!user) return;
+    return rows.filter(Boolean);
+  };
 
-		try {
-			setSaving(true);
-			setUploadingPhoto(Boolean(photoFile));
-			setErrorMessage("");
-			setSuccessMessage("");
+  useEffect(() => {
+    if (!user?.uid) return;
 
-			let photoURL = formData.photoURL;
-			if (photoFile) {
-				photoURL = await uploadImageFile({
-					file: photoFile,
-					storage,
-					pathPrefix: `profile-photos/${user.uid}`,
-				});
-			}
+    const followersQ = query(collection(db, "follows"), where("followingId", "==", user.uid));
+    const unsubFollowers = onSnapshot(followersQ, async (snap) => {
+      const requestId = ++followersRequestSeqRef.current;
+      const ids = snap.docs.map((docItem) => docItem.data()?.followerId).filter(Boolean);
+      const profilesList = await fetchUserProfiles(ids);
+      if (requestId === followersRequestSeqRef.current) {
+        setFollowers(profilesList);
+      }
+    });
 
-			await updateProfile(auth.currentUser, {
-				displayName: formData.displayName,
-				photoURL,
-			});
-			await auth.currentUser?.reload();
+    const followingQ = query(collection(db, "follows"), where("followerId", "==", user.uid));
+    const unsubFollowing = onSnapshot(followingQ, async (snap) => {
+      const requestId = ++followingRequestSeqRef.current;
+      const ids = snap.docs.map((docItem) => docItem.data()?.followingId).filter(Boolean);
+      const profilesList = await fetchUserProfiles(ids);
+      if (requestId === followingRequestSeqRef.current) {
+        setFollowing(profilesList);
+      }
+    });
 
-			await updateMyProfile({
-				displayName: formData.displayName,
-				bio: formData.bio,
-				isPrivate: formData.isPrivate,
-				photoURL,
-			});
+    return () => {
+      followersRequestSeqRef.current += 1;
+      followingRequestSeqRef.current += 1;
+      unsubFollowers();
+      unsubFollowing();
+    };
+  }, [user?.uid]);
 
-			await setDoc(
-				doc(db, "users", user.uid),
-				{
-					displayName: formData.displayName,
-					bio: formData.bio,
-					isPrivate: formData.isPrivate,
-					photoURL,
-					updatedAt: serverTimestamp(),
-				},
-				{ merge: true }
-			);
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.uid) return;
 
-			setFormData((prev) => ({ ...prev, photoURL }));
-			setPhotoFile(null);
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file.");
+      return;
+    }
 
-			setSuccessMessage("Profile updated successfully.");
-		} catch (error) {
-			setErrorMessage(error.message || "Could not save profile.");
-		} finally {
-			setUploadingPhoto(false);
-			setSaving(false);
-		}
-	};
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be under 5MB.");
+      return;
+    }
 
-	const markNotificationRead = async (notificationId) => {
-		await updateDoc(doc(db, "notifications", notificationId), { isRead: true, readAt: serverTimestamp() });
-	};
+    setUploading(true);
+    setError("");
+    setSuccess("");
 
-	if (loading) {
-		return (
-			<main>
-				<section className="profile-container">
-					<p>Loading your profile...</p>
-				</section>
-			</main>
-		);
-	}
+    try {
+      const ext = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
+      const storageRef = ref(storage, `avatars/${user.uid}_${Date.now()}.${ext}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-	return (
-		<main>
-			<section className="profile-container">
-				<header className="profile-header">
-					{formData.photoURL ? (
-						<img src={formData.photoURL} alt="Profile" className="profile-avatar-img" />
-					) : (
-						<div className="profile-avatar">{formData.displayName?.charAt(0)?.toUpperCase() || "D"}</div>
-					)}
-					<h1>My Profile</h1>
-					<p>Manage your account details and tell people what you're building.</p>
-				</header>
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgress(pct);
+        },
+        (uploadErr) => {
+          setError(`Upload failed: ${uploadErr.message}`);
+          setUploading(false);
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-				<div className="profile-info">
-					<div className="profile-info-row">
-						<span className="profile-info-label">Email</span>
-						<span>{user?.email || "Not available"}</span>
-					</div>
-					<div className="profile-info-row">
-						<span className="profile-info-label">Verified</span>
-						<span>{user?.emailVerified ? "Yes" : "No"}</span>
-					</div>
-					<div className="profile-info-row">
-						<span className="profile-info-label">Followers</span>
-						<span>{followersCount.toLocaleString()}</span>
-					</div>
-					<div className="profile-info-row">
-						<span className="profile-info-label">Following</span>
-						<span>{followingCount.toLocaleString()}</span>
-					</div>
-				</div>
+            await updateProfile(auth.currentUser, { photoURL: downloadURL });
+            await setDoc(
+              doc(db, "users", user.uid),
+              { avatarUrl: downloadURL, updatedAt: serverTimestamp() },
+              { merge: true }
+            );
 
-				<form className="profile-form" onSubmit={onSubmit}>
-					<div className="profile-form-group">
-						<label htmlFor="photo">Profile picture</label>
-						<input
-							id="photo"
-							type="file"
-							accept="image/*"
-							onChange={(event) => setPhotoFile(event.target.files?.[0] || null)}
-						/>
-						<p className="profile-privacy-note">Upload a photo to personalize your profile.</p>
-					</div>
+            setSuccess("Profile photo updated!");
+          } catch (completionErr) {
+            setError(`Upload failed: ${completionErr.message}`);
+          } finally {
+            setUploading(false);
+            setUploadProgress(0);
+          }
+        }
+      );
+    } catch (err) {
+      setError(`Upload error: ${err.message}`);
+      setUploading(false);
+    }
+  };
 
-					<div className="profile-form-group">
-						<label htmlFor="displayName">Display Name</label>
-						<input
-							id="displayName"
-							name="displayName"
-							type="text"
-							value={formData.displayName}
-							onChange={onChange}
-							required
-						/>
-					</div>
+  const handleSave = async (event) => {
+    event.preventDefault();
+    if (!user?.uid) return;
 
-					<div className="profile-form-group">
-						<label htmlFor="bio">Bio</label>
-						<textarea
-							id="bio"
-							name="bio"
-							rows="5"
-							value={formData.bio}
-							onChange={onChange}
-							placeholder="Tell other developers what you are working on"
-						/>
-					</div>
+    setSaving(true);
+    setError("");
+    setSuccess("");
 
-					<div className="profile-privacy-row">
-	                                               {/* Private account toggle. */}
-						<label htmlFor="isPrivate">Private account</label>
-						<input
-							id="isPrivate"
-							name="isPrivate"
-							type="checkbox"
-							checked={formData.isPrivate}
-							onChange={onChange}
-						/>
-					</div>
-					<p className="profile-privacy-note">
-						When private, only you and followers can see your project activity.
-					</p>
+    try {
+      const skillsArray = formData.skills
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
 
-					<button className="profile-button" type="submit" disabled={saving || uploadingPhoto}>
-						{saving || uploadingPhoto ? "Saving..." : "Save Profile"}
-					</button>
+      await updateProfile(auth.currentUser, { displayName: formData.name });
 
-					{errorMessage && <p className="error-message">{errorMessage}</p>}
-					{successMessage && <p className="success-message">{successMessage}</p>}
-				</form>
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          name: formData.name,
+          bio: formData.bio,
+          github: formData.github,
+          skills: skillsArray,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
 
-				<section className="profile-notifications">
-					<h2>Follow notifications</h2>
-					{followNotifications.length === 0 ? <p>No new follows yet.</p> : null}
-					{followNotifications.map((notification) => (
-						<article key={notification.id} className="notification-item">
-							<div>
-								<p>{notification.message || "Someone followed you."}</p>
-								<small>{notification.isRead ? "Read" : "Unread"}</small>
-							</div>
-							{!notification.isRead ? (
-								<button type="button" onClick={() => markNotificationRead(notification.id)}>
-									Mark read
-								</button>
-							) : null}
-						</article>
-					))}
-				</section>
-			</section>
-		</main>
-	);
-}
+      setSuccess("Profile saved!");
+      setEditing(false);
+    } catch (err) {
+      setError(`Failed to save: ${err.message}`);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) return;
+
+    try {
+      await sendPasswordResetEmail(auth, user.email);
+      setSuccess(`Password reset email sent to ${user.email}`);
+      setShowMenu(false);
+    } catch {
+      setError("Could not send reset email.");
+    }
+  };
+
+  const stageClass = (stage) => {
+    const map = {
+      idea: "profile-stage-idea",
+      building: "profile-stage-building",
+      beta: "profile-stage-beta",
+      completed: "profile-stage-completed",
+    };
+    return map[stage] || "profile-stage-default";
+  };
+
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <div className="profile-page-inner">
+          <p className="profile-loading">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const avatarUrl = profile?.avatarUrl || user?.photoURL;
+  const displayName = profile?.name || user?.displayName || "Developer";
+
+  return (
+    <div className="profile-page">
+      <div className="profile-page-inner">
+        <div className="profile-topbar">
+          <div className="profile-avatar-wrap">
+            <label htmlFor="avatar-upload" className="profile-avatar-label">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar" className="profile-avatar-image" />
+              ) : (
+                <div className="profile-avatar-fallback">{displayName[0].toUpperCase()}</div>
+              )}
+              <div className="profile-avatar-overlay">{uploading ? `${uploadProgress}%` : "Change"}</div>
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              disabled={uploading}
+              className="profile-hidden-input"
+            />
+          </div>
+
+          <div className="profile-main-meta">
+            <h1 className="profile-name">{displayName}</h1>
+            <p className="profile-email">{user?.email}</p>
+            {profile?.bio ? <p className="profile-bio">{profile.bio}</p> : null}
+            {profile?.github ? (
+              <a
+                href={`https://github.com/${profile.github}`}
+                target="_blank"
+                rel="noreferrer"
+                className="profile-github-link"
+              >
+                github.com/{profile.github}
+              </a>
+            ) : null}
+
+            <div className="profile-stats-row">
+              <button type="button" className="profile-stat-btn" onClick={() => setActiveTab("projects")}>
+                <span className="profile-stat-num">{projects.length}</span>
+                <span className="profile-stat-label">projects</span>
+              </button>
+              <button type="button" className="profile-stat-btn" onClick={() => setActiveTab("followers")}>
+                <span className="profile-stat-num">{followers.length}</span>
+                <span className="profile-stat-label">followers</span>
+              </button>
+              <button type="button" className="profile-stat-btn" onClick={() => setActiveTab("following")}>
+                <span className="profile-stat-num">{following.length}</span>
+                <span className="profile-stat-label">following</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="profile-menu-wrap" ref={menuRef}>
+            <button type="button" className="profile-menu-btn" onClick={() => setShowMenu((prev) => !prev)}>
+              ...
+            </button>
+            {showMenu ? (
+              <div className="profile-dropdown">
+                <button
+                  type="button"
+                  className="profile-dropdown-item"
+                  onClick={() => {
+                    setEditing(true);
+                    setShowMenu(false);
+                  }}
+                >
+                  Edit profile
+                </button>
+                <button type="button" className="profile-dropdown-item" onClick={handlePasswordReset}>
+                  Change password
+                </button>
+                <button
+                  type="button"
+                  className="profile-dropdown-item"
+                  onClick={() => navigate("/settings")}
+                >
+                  Settings
+                </button>
+                <div className="profile-dropdown-sep" />
+                <button
+                  type="button"
+                  className="profile-dropdown-item profile-dropdown-danger"
+                  onClick={async () => {
+                    await auth.signOut();
+                    navigate("/auth");
+                  }}
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        {Array.isArray(profile?.skills) && profile.skills.length > 0 ? (
+          <div className="profile-skills-row">
+            {profile.skills.map((skill) => (
+              <span key={skill} className="profile-skill-pill">
+                {skill}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        {error ? <p className="profile-error">{error}</p> : null}
+        {success ? <p className="profile-success">{success}</p> : null}
+
+        {editing ? (
+          <form onSubmit={handleSave} className="profile-edit-form">
+            <h3 className="profile-edit-title">Edit profile</h3>
+
+            <div className="profile-field">
+              <label htmlFor="profile-name">Display name</label>
+              <input
+                id="profile-name"
+                value={formData.name}
+                onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="profile-bio">Bio</label>
+              <textarea
+                id="profile-bio"
+                value={formData.bio}
+                onChange={(event) => setFormData((prev) => ({ ...prev, bio: event.target.value }))}
+                rows={3}
+                placeholder="Tell other developers what you are working on..."
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="profile-github">GitHub username</label>
+              <input
+                id="profile-github"
+                value={formData.github}
+                onChange={(event) => setFormData((prev) => ({ ...prev, github: event.target.value }))}
+                placeholder="e.g. thurlowmoses"
+              />
+            </div>
+
+            <div className="profile-field">
+              <label htmlFor="profile-skills">Skills (comma separated)</label>
+              <input
+                id="profile-skills"
+                value={formData.skills}
+                onChange={(event) => setFormData((prev) => ({ ...prev, skills: event.target.value }))}
+                placeholder="e.g. React, Python, Firebase"
+              />
+            </div>
+
+            <div className="profile-edit-actions">
+              <button
+                type="button"
+                className="profile-btn profile-btn-cancel"
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="profile-btn profile-btn-save" disabled={saving}>
+                {saving ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </form>
+        ) : null}
+
+        <div className="profile-tabs">
+          {["projects", "followers", "following"].map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={`profile-tab ${activeTab === tab ? "is-active" : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === "projects" ? (
+          <div className="profile-list-col">
+            {projects.length === 0 ? (
+              <div className="profile-empty-state">
+                <p>No projects yet.</p>
+                <button type="button" className="profile-btn profile-btn-save" onClick={() => navigate("/projects/new")}>
+                  Post your first project
+                </button>
+              </div>
+            ) : (
+              projects.map((project) => (
+                <div key={project.id} className="profile-project-card">
+                  <div className="profile-project-main">
+                    <div className="profile-project-headline">
+                      <span className={`profile-stage-pill ${stageClass(project.stage)}`}>
+                        {project.stage || "idea"}
+                      </span>
+                      {project.completed ? <span className="profile-stage-icon">TROPHY</span> : null}
+                    </div>
+                    <p className="profile-project-title" onClick={() => navigate(`/projects/${project.id}`)}>
+                      {project.title}
+                    </p>
+                    <p className="profile-project-desc">{project.description}</p>
+                    {Array.isArray(project.techStack) && project.techStack.length > 0 ? (
+                      <div className="profile-project-tech-row">
+                        {project.techStack.map((tech) => (
+                          <span key={tech} className="profile-tech-pill">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    className="profile-btn profile-btn-edit"
+                    onClick={() => navigate(`/projects/${project.id}/edit`)}
+                  >
+                    Edit
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        ) : null}
+
+        {activeTab === "followers" ? (
+          <div className="profile-list-col">
+            {followers.length === 0 ? (
+              <div className="profile-empty-state">
+                <p>No followers yet.</p>
+              </div>
+            ) : (
+              followers.map((row) => (
+                <button
+                  key={row.uid}
+                  type="button"
+                  className="profile-connection-card"
+                  onClick={() => navigate(`/profile/${row.uid}`)}
+                >
+                  <div className="profile-connection-avatar">
+                    {row.avatarUrl ? (
+                      <img src={row.avatarUrl} alt="" className="profile-connection-avatar-img" />
+                    ) : (
+                      (row.name || "D")[0].toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <p className="profile-connection-name">{row.name || row.email || "Developer"}</p>
+                    <p className="profile-connection-meta">{row.bio || "Developer"}</p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        ) : null}
+
+        {activeTab === "following" ? (
+          <div className="profile-list-col">
+            {following.length === 0 ? (
+              <div className="profile-empty-state">
+                <p>Not following anyone yet.</p>
+                <button
+                  type="button"
+                  className="profile-btn profile-btn-save"
+                  onClick={() => navigate("/discovery")}
+                >
+                  Find developers
+                </button>
+              </div>
+            ) : (
+              following.map((row) => (
+                <button
+                  key={row.uid}
+                  type="button"
+                  className="profile-connection-card"
+                  onClick={() => navigate(`/profile/${row.uid}`)}
+                >
+                  <div className="profile-connection-avatar">
+                    {row.avatarUrl ? (
+                      <img src={row.avatarUrl} alt="" className="profile-connection-avatar-img" />
+                    ) : (
+                      (row.name || "D")[0].toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <p className="profile-connection-name">{row.name || row.email || "Developer"}</p>
+                    <p className="profile-connection-meta">{row.bio || "Developer"}</p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 export default ProfilePage;

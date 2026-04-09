@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from fastapi import Depends, Header, HTTPException, status
+from firebase_admin import auth as firebase_auth
 
 from firebase_admin_config import verify_firebase_token
 
@@ -11,7 +12,6 @@ class CurrentUser:
     uid: str
     email: str | None
     name: str | None
-
 
 def _parse_bearer_token(authorization: str | None) -> str:
     # Reject missing or malformed auth headers early.
@@ -44,10 +44,36 @@ def get_current_user(authorization: str | None = Header(default=None)) -> Curren
 
     try:
         decoded = verify_firebase_token(token)
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except firebase_auth.ExpiredIdTokenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Firebase token expired. Please sign in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+    except firebase_auth.RevokedIdTokenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Firebase token was revoked. Please sign in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+    except firebase_auth.InvalidIdTokenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=(
+                "Invalid Firebase token. Check that backend Firebase Admin credentials and "
+                "FIREBASE_PROJECT_ID match the frontend Firebase project."
+            ),
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired Firebase token",
+            detail=f"Token verification failed: {exc}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 

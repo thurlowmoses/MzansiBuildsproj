@@ -98,6 +98,39 @@
   color: var(--color-gray-dark);
 }
 
+.password-checklist {
+  margin: var(--spacing-xs) 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.password-checklist li {
+  font-size: var(--font-size-xs);
+  margin: 0;
+}
+
+.password-checklist li.passed {
+  color: var(--color-success);
+}
+
+.password-checklist li.pending {
+  color: var(--color-text-secondary);
+}
+
+.password-match {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.password-match.pass {
+  color: var(--color-success);
+}
+
+.password-match.fail {
+  color: var(--color-error);
+}
+
 .forgot-password-btn {
   align-self: flex-start;
   background: none;

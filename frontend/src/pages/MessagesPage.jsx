@@ -183,6 +183,11 @@ function MessagesPage() {
     });
   }, [developers, searchText]);
 
+  const targetUserIdFromQuery = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("userId") || "";
+  }, [location.search]);
+
   const conversationRows = useMemo(() => {
     return chats
       .map((chat) => {
@@ -208,6 +213,29 @@ function MessagesPage() {
   }, [chats, developersById, user?.uid, user?.displayName, user?.email]);
 
   const canMessage = (developer) => !developer?.isPrivate || followingSet.has(developer.id);
+
+  useEffect(() => {
+    if (!targetUserIdFromQuery || !user?.uid) {
+      return;
+    }
+
+    if (targetUserIdFromQuery === user.uid) {
+      return;
+    }
+
+    const target = developersById[targetUserIdFromQuery];
+    if (!target || !canMessage(target)) {
+      return;
+    }
+
+    const existing = chats.find(
+      (chat) => Array.isArray(chat.participants) && chat.participants.includes(targetUserIdFromQuery)
+    );
+
+    setSelectedUserId(targetUserIdFromQuery);
+    setSelectedChatId(existing ? existing.id : "");
+    setShowAccountPreview(false);
+  }, [targetUserIdFromQuery, user?.uid, developersById, chats, followingSet]);
 
   const openConversation = (chatId, peerId) => {
     // Open an existing thread.
@@ -255,16 +283,21 @@ function MessagesPage() {
     });
 
     const followedDeveloper = developersById[developerId];
+    const isPrivate = Boolean(followedDeveloper?.isPrivate);
     await addDoc(collection(db, "notifications"), {
-      type: "follow",
+      type: isPrivate ? "follow_request" : "follow",
       recipientId: developerId,
       actorId: user.uid,
       actorName: user.displayName || user.email || "Developer",
       actorPhotoURL: user.photoURL || "",
-      message: `${user.displayName || user.email || "Developer"} started following you.`,
+      message: isPrivate
+        ? `${user.displayName || user.email || "Developer"} requested to follow you.`
+        : `${user.displayName || user.email || "Developer"} started following you.`,
       isRead: false,
       createdAt: serverTimestamp(),
       recipientName: followedDeveloper?.name || "Developer",
+      targetType: "profile",
+      targetId: developerId,
     });
   };
 
@@ -302,6 +335,19 @@ function MessagesPage() {
         recipientId: selectedUser.id,
         text,
         createdAt: serverTimestamp(),
+      });
+
+      await addDoc(collection(db, "notifications"), {
+        type: "message",
+        recipientId: selectedUser.id,
+        actorId: user.uid,
+        actorName: user.displayName || user.email || "Developer",
+        actorPhotoURL: user.photoURL || "",
+        message: `${user.displayName || user.email || "Developer"} sent you a message.`,
+        isRead: false,
+        createdAt: serverTimestamp(),
+        targetType: "messages",
+        targetId: selectedUser.id,
       });
 
       setSelectedChatId(chatId);

@@ -20,8 +20,8 @@ body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
-  color: var(--color-black);
-  background-color: var(--color-white);
+  color: var(--color-text);
+  background-color: var(--color-bg);
   transition: background-color var(--transition-normal),
               color var(--transition-normal);
 }
@@ -31,7 +31,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: var(--line-height-tight);
   margin-bottom: var(--spacing-md);
-  color: var(--color-black);
+  color: var(--color-text);
 }
 
 h1 {
@@ -58,6 +58,7 @@ h5, h6 {
 p {
   margin-bottom: var(--spacing-md);
   line-height: var(--line-height-relaxed);
+  color: var(--color-text);
 }
 
 /* Links */
@@ -81,6 +82,12 @@ button {
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: var(--font-size-base);
   transition: all var(--transition-fast);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+button:hover {
+  background-color: var(--color-bg-hover);
 }
 
 /* Form Elements */
@@ -90,11 +97,12 @@ select {
   font-family: inherit;
   font-size: var(--font-size-base);
   padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--color-gray-medium);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-white);
-  color: var(--color-black);
-  transition: border-color var(--transition-fast);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
 }
 
 input:focus,
@@ -102,7 +110,7 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 textarea {
@@ -124,6 +132,8 @@ li {
 main {
   min-height: 100vh;
   padding: var(--spacing-lg);
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* Utility Classes */
@@ -143,4 +153,73 @@ main {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Mobile Responsive Base */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    font-size: var(--font-size-sm);
+  }
+
+  main {
+    padding: var(--spacing-md);
+  }
+
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  input,
+  textarea,
+  select {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  textarea {
+    min-height: 5rem;
+  }
+}
+
+/* Tablet Responsive */
+@media (min-width: 641px) and (max-width: 1024px) {
+  main {
+    padding: var(--spacing-lg);
+  }
+
+  .container {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+/* Desktop and larger */
+@media (min-width: 1025px) {
+  main {
+    padding: var(--spacing-2xl);
+  }
+
+  .container {
+    padding: 0 var(--spacing-2xl);
+  }
 }

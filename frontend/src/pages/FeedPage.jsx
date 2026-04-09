@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
 import {
 	addDoc,
 	collection,
@@ -88,10 +89,6 @@ function ProjectCard({ project, onComment, onCollab, onToggleCompletion, navigat
 
 				<p className="card-description">{project.description}</p>
 
-				{project.codeImageUrl ? (
-					<img src={project.codeImageUrl} alt={`${project.title} code screenshot`} className="card-code-image" />
-				) : null}
-
 				{Array.isArray(project.techStack) && project.techStack.length > 0 ? (
 					<div className="tech-stack">
 						{project.techStack.map((tech) => (
@@ -167,7 +164,8 @@ function FeedPage() {
 	const [loadingUser, setLoadingUser] = useState(true);
 	const [userError, setUserError] = useState("");
 	const [privacyByUserId, setPrivacyByUserId] = useState({});
-	const [followingSet, setFollowingSet] = useState(new Set());
+	const [following, setFollowing] = useState([]);
+	const [hasFollowing, setHasFollowing] = useState(false);
 
 	useEffect(() => {
 		// Load public project cards in real time.
@@ -205,21 +203,40 @@ function FeedPage() {
 	}, []);
 
 	useEffect(() => {
-		// Only show private projects to followers.
-		if (!auth.currentUser?.uid) {
-			setFollowingSet(new Set());
-			return;
-		}
+		let unsubFollows = () => {};
 
-		const followsQuery = query(collection(db, "follows"), where("followerId", "==", auth.currentUser.uid));
+		const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+			unsubFollows();
 
-		const unsubscribe = onSnapshot(followsQuery, (snapshot) => {
-			const nextSet = new Set(snapshot.docs.map((docItem) => (docItem.data() || {}).followingId).filter(Boolean));
-			setFollowingSet(nextSet);
+			if (!firebaseUser) {
+				setFollowing([]);
+				setHasFollowing(false);
+				return;
+			}
+
+			// Listen to the follows subcollection for this user.
+			// When they follow someone, this updates automatically.
+			const followsRef = collection(db, "users", firebaseUser.uid, "following");
+			unsubFollows = onSnapshot(
+				followsRef,
+				(snap) => {
+					const followedIds = snap.docs.map((d) => d.id);
+					setFollowing(followedIds);
+					setHasFollowing(followedIds.length > 0);
+				},
+				(error) => {
+					console.error("Failed to load following list:", error);
+					setFollowing([]);
+					setHasFollowing(false);
+				}
+			);
 		});
 
-		return () => unsubscribe();
-	}, [auth.currentUser?.uid]);
+		return () => {
+			unsubFollows();
+			unsubAuth();
+		};
+	}, []);
 
 	const visibleUserProjects = useMemo(() => {
 		const currentUserId = auth.currentUser?.uid;
@@ -240,9 +257,15 @@ function FeedPage() {
 				return true;
 			}
 
-			return followingSet.has(ownerId);
+			return following.includes(ownerId);
 		});
-	}, [userProjects, privacyByUserId, followingSet]);
+	}, [userProjects, privacyByUserId, following]);
+
+	// If user follows people, show only their projects.
+	// If user follows nobody yet, show everyone (Option A — discovery mode).
+	const displayProjects = hasFollowing
+		? visibleUserProjects.filter((project) => project.userId == null || following.includes(project.userId))
+		: visibleUserProjects;
 
 	const handleComment = async (projectId, text) => {
 		// Write comments to the project subcollection.
@@ -319,11 +342,59 @@ function FeedPage() {
 			</div>
 
 			{userError ? <p className="feed-error">{userError}</p> : null}
-			{visibleUserProjects.length > 0 ? (
+			{displayProjects.length > 0 ? (
 				<>
+					{/* Follow banner — only shown when user follows nobody yet */}
+					{!hasFollowing && auth.currentUser && (
+						<div
+							style={{
+								background: "#0d1f0d",
+								border: "1px solid #1a3a1a",
+								borderRadius: "10px",
+								padding: "12px 16px",
+								marginBottom: "1rem",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "space-between",
+								flexWrap: "wrap",
+								gap: "8px",
+							}}
+						>
+							<div>
+								<p
+									style={{
+										fontSize: "13px",
+										fontWeight: "600",
+										color: "#4caf50",
+										margin: "0 0 2px",
+									}}
+								>
+									Personalise your feed
+								</p>
+								<p style={{ fontSize: "12px", color: "#3B6D11", margin: 0 }}>
+									Follow developers to see only their projects here. Currently showing everyone.
+								</p>
+							</div>
+							<button
+								onClick={() => navigate("/discovery")}
+								style={{
+									background: "#2d6a2d",
+									color: "#fff",
+									border: "none",
+									borderRadius: "6px",
+									padding: "7px 14px",
+									fontSize: "12px",
+									cursor: "pointer",
+									whiteSpace: "nowrap",
+								}}
+							>
+								Find developers
+							</button>
+						</div>
+					)}
 					<p className="feed-section-label">From the community</p>
 					<section className="feed-list">
-						{visibleUserProjects.map((project) => (
+						{displayProjects.map((project) => (
 							<ProjectCard
 								key={project.id}
 								project={project}
@@ -338,7 +409,7 @@ function FeedPage() {
 				</>
 			) : null}
 
-			{visibleUserProjects.length === 0 && !loadingUser ? (
+			{displayProjects.length === 0 && !loadingUser ? (
 				<div className="feed-empty">
 					<p>No projects posted yet. Be the first to build in public.</p>
 					<button type="button" onClick={() => navigate("/projects/new")} className="new-project-btn feed-empty-btn">

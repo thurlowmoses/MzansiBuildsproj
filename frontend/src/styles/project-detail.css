@@ -5,6 +5,35 @@
   padding: 2rem 1rem;
 }
 
+.detail-celebration-pop {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 260;
+  border: 1px solid #22c55e;
+  background: rgba(6, 78, 59, 0.95);
+  color: #dcfce7;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  animation: detail-celebrate-pop 0.35s ease;
+}
+
+@keyframes detail-celebrate-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
 .detail-container {
   max-width: 900px;
   margin: 0 auto;
@@ -172,6 +201,66 @@
   cursor: not-allowed;
 }
 
+.timeline-heading {
+  margin: 1rem 0 0.6rem;
+  font-size: 1rem;
+  color: #d1fae5;
+}
+
+.timeline-empty {
+  color: #9ca3af;
+  margin: 0.2rem 0 0;
+}
+
+.timeline-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  background: #0a0f15;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 0.7rem;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: #94a3b8;
+}
+
+.timeline-item.status-in-progress .timeline-dot {
+  background: #f59e0b;
+}
+
+.timeline-item.status-done .timeline-dot {
+  background: #22c55e;
+}
+
+.timeline-title {
+  margin: 0;
+  color: #e5e7eb;
+  font-weight: 600;
+}
+
+.timeline-meta {
+  margin: 0.2rem 0 0;
+  color: #86efac;
+  font-size: 0.78rem;
+  text-transform: capitalize;
+}
+
+.timeline-note {
+  margin: 0.35rem 0 0;
+  color: #9ca3af;
+}
+
 .comment-author {
   color: #86efac;
   margin: 0 0 0.25rem;
@@ -192,6 +281,48 @@
   border-radius: 8px;
   padding: 0.55rem 0.85rem;
   cursor: pointer;
+}
+
+.completion-button.secondary {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.completion-button.danger {
+  background: #7f1d1d;
+  border-color: #991b1b;
+}
+
+.project-edit-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.project-edit-form input,
+.project-edit-form textarea,
+.project-edit-form select {
+  background: #0b0f16;
+  border: 1px solid #374151;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font: inherit;
+}
+
+.project-edit-form input:focus,
+.project-edit-form textarea:focus,
+.project-edit-form select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.project-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
 }
 
 .completion-button:disabled {

@@ -24,13 +24,15 @@ def _ensure_project_exists(project_id: str):
 	snapshot = db.collection("projects").document(project_id).get()
 	if not snapshot.exists:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+	return snapshot
 
 
 @router.post("/projects/{project_id}/comments")
 def create_comment(project_id: str, payload: CommentCreateRequest, user: CurrentUser = CurrentUserDep):
 	# Store comments under the project document.
 	db = get_firestore_client()
-	_ensure_project_exists(project_id)
+	project_snapshot = _ensure_project_exists(project_id)
+	project = project_snapshot.to_dict() or {}
 
 	ref = db.collection("projects").document(project_id).collection("comments").document()
 	ref.set(
@@ -38,6 +40,49 @@ def create_comment(project_id: str, payload: CommentCreateRequest, user: Current
 			"content": payload.content,
 			"userId": user.uid,
 			"userName": user.name or user.email or "Developer",
+			"createdAt": firestore.SERVER_TIMESTAMP,
+		}
+	)
+
+	db.collection("projects").document(project_id).set(
+		{
+			"commentCount": firestore.Increment(1),
+			"updatedAt": firestore.SERVER_TIMESTAMP,
+		},
+		merge=True,
+	)
+
+	if project.get("userId") and project.get("userId") != user.uid:
+		db.collection("notifications").document().set(
+			{
+				"type": "comment",
+				"recipientId": project["userId"],
+				"actorId": user.uid,
+				"actorName": user.name or user.email or "Developer",
+				"actorPhotoURL": "",
+				"message": f"{user.name or user.email or 'Developer'} commented on your project {project.get('title', 'Project')}.",
+				"isRead": False,
+				"createdAt": firestore.SERVER_TIMESTAMP,
+				"targetType": "project",
+				"targetId": project_id,
+				"projectId": project_id,
+				"projectTitle": project.get("title", "Project"),
+			}
+		)
+
+	db.collection("activities").document().set(
+		{
+			"type": "project_commented",
+			"projectId": project_id,
+			"projectTitle": project.get("title", "Project"),
+			"projectDescription": project.get("description", ""),
+			"projectStage": project.get("stage", "idea"),
+			"projectSupportNeeded": project.get("supportNeeded", ""),
+			"projectTechStack": project.get("techStack", []),
+			"projectUserId": project.get("userId", ""),
+			"projectUserName": project.get("userName", "Developer"),
+			"actorId": user.uid,
+			"actorName": user.name or user.email or "Developer",
 			"createdAt": firestore.SERVER_TIMESTAMP,
 		}
 	)
@@ -87,7 +132,8 @@ def create_collaboration_request(
 ):
 	# Collaboration requests live beside the project.
 	db = get_firestore_client()
-	_ensure_project_exists(project_id)
+	project_snapshot = _ensure_project_exists(project_id)
+	project = project_snapshot.to_dict() or {}
 
 	ref = (
 		db.collection("projects")
@@ -102,6 +148,49 @@ def create_collaboration_request(
 			"requesterEmail": user.email or "",
 			"message": payload.message,
 			"status": "open",
+			"createdAt": firestore.SERVER_TIMESTAMP,
+		}
+	)
+
+	db.collection("projects").document(project_id).set(
+		{
+			"collabCount": firestore.Increment(1),
+			"updatedAt": firestore.SERVER_TIMESTAMP,
+		},
+		merge=True,
+	)
+
+	if project.get("userId") and project.get("userId") != user.uid:
+		db.collection("notifications").document().set(
+			{
+				"type": "collaboration",
+				"recipientId": project["userId"],
+				"actorId": user.uid,
+				"actorName": user.name or user.email or "Developer",
+				"actorPhotoURL": "",
+				"message": f"{user.name or user.email or 'Developer'} raised their hand for your project {project.get('title', 'Project')}.",
+				"isRead": False,
+				"createdAt": firestore.SERVER_TIMESTAMP,
+				"targetType": "project",
+				"targetId": project_id,
+				"projectId": project_id,
+				"projectTitle": project.get("title", "Project"),
+			}
+		)
+
+	db.collection("activities").document().set(
+		{
+			"type": "collaboration_requested",
+			"projectId": project_id,
+			"projectTitle": project.get("title", "Project"),
+			"projectDescription": project.get("description", ""),
+			"projectStage": project.get("stage", "idea"),
+			"projectSupportNeeded": project.get("supportNeeded", ""),
+			"projectTechStack": project.get("techStack", []),
+			"projectUserId": project.get("userId", ""),
+			"projectUserName": project.get("userName", "Developer"),
+			"actorId": user.uid,
+			"actorName": user.name or user.email or "Developer",
 			"createdAt": firestore.SERVER_TIMESTAMP,
 		}
 	)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from auth import CurrentUser, CurrentUserDep
@@ -14,6 +14,11 @@ class UpdateProfileRequest(BaseModel):
 	bio: str | None = None
 	photoURL: str | None = None
 	isPrivate: bool | None = None
+
+
+class FollowRequest(BaseModel):
+	# Request to follow another user.
+	targetUserId: str
 
 
 @router.get("/me")
@@ -57,3 +62,56 @@ def update_my_profile(payload: UpdateProfileRequest, user: CurrentUser = Current
 		"uid": user.uid,
 		"applied": updates,
 	}
+
+
+@router.post("/follow")
+def follow_user(payload: FollowRequest, user: CurrentUser = CurrentUserDep):
+	# Create a follow relationship and send notification.
+	db = get_firestore_client()
+	target_id = payload.targetUserId
+
+	# Prevent following yourself.
+	if target_id == user.uid:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot follow yourself")
+
+	# Check if target user exists.
+	target_snapshot = db.collection("users").document(target_id).get()
+	target_data = target_snapshot.to_dict() or {} if target_snapshot.exists else {}
+
+	# Create the follow relationship.
+	db.collection("follows").document().set({
+		"followerId": user.uid,
+		"followerName": user.name or user.email or "Developer",
+		"followerPhotoURL": "",
+		"followingId": target_id,
+		"createdAt": firestore.SERVER_TIMESTAMP,
+	})
+
+	# Create notification for the user being followed.
+	db.collection("notifications").document().set({
+		"type": "follow",
+		"recipientId": target_id,
+		"actorId": user.uid,
+		"actorName": user.name or user.email or "Developer",
+		"actorPhotoURL": "",
+		"message": f"{user.name or user.email or 'Developer'} started following you.",
+		"isRead": False,
+		"createdAt": firestore.SERVER_TIMESTAMP,
+		"targetType": "profile",
+		"targetId": user.uid,
+	})
+
+	return {"message": "Followed user", "followingId": target_id}
+
+
+@router.delete("/follow/{target_id}")
+def unfollow_user(target_id: str, user: CurrentUser = CurrentUserDep):
+	# Remove follow relationship.
+	db = get_firestore_client()
+
+	# Find and delete the follow document.
+	follows = db.collection("follows").where("followerId", "==", user.uid).where("followingId", "==", target_id).stream()
+	for doc in follows:
+		doc.reference.delete()
+
+	return {"message": "Unfollowed user", "targetId": target_id}

@@ -27,36 +27,45 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = async ({ email, password, displayName }) => {
-    // Create the auth account first, then mirror profile data in Firestore.
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    if (displayName) {
-      await updateProfile(credential.user, { displayName });
-    }
+    await updateProfile(user, { displayName });
+
+    await sendEmailVerification(user);
 
     await setDoc(
-      doc(db, "users", credential.user.uid),
+      doc(db, "users", user.uid),
       {
-        uid: credential.user.uid,
-        displayName: displayName || credential.user.email?.split("@")[0] || "Developer",
-        email: credential.user.email,
+        uid: user.uid,
+        name: displayName,
+        displayName: displayName || user.email?.split("@")[0] || "Developer",
+        email: user.email,
         bio: "",
+        github: "",
+        skills: [],
+        avatarUrl: "",
+        emailVerified: false,
         isPrivate: false,
-        photoURL: credential.user.photoURL || "",
+        photoURL: user.photoURL || "",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        lastLoginAt: serverTimestamp(),
       },
       { merge: true }
     );
 
-    await sendEmailVerification(credential.user);
-    return credential.user;
+    return user;
   };
 
   const login = async ({ email, password }) => {
-    // Refresh the Firestore profile on sign-in.
     const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    if (!credential.user.emailVerified) {
+      await signOut(auth);
+      throw new Error(
+        "Please verify your email before logging in. Check your inbox for the verification link."
+      );
+    }
 
     await setDoc(
       doc(db, "users", credential.user.uid),
@@ -66,6 +75,7 @@ export function AuthProvider({ children }) {
         displayName:
           credential.user.displayName || credential.user.email?.split("@")[0] || "Developer",
         photoURL: credential.user.photoURL || "",
+        emailVerified: true,
         lastLoginAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       },

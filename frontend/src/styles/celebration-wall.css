@@ -80,3 +80,12 @@
 .celebration-link:hover {
   text-decoration: underline;
 }
+
+.celebration-breakthroughs {
+  margin-top: 2rem;
+}
+
+.celebration-breakthrough-title {
+  margin: 0;
+  font-size: 1.25rem;
+}

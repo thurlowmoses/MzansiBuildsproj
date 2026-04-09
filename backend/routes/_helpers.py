@@ -15,3 +15,7 @@ def serialize_snapshot(snapshot):
     payload = snapshot.to_dict() or {}
     payload["id"] = snapshot.id
     return _serialize_value(payload)
+
+
+def is_breakthrough_milestone(payload):
+    return (payload or {}).get("status") == "done"

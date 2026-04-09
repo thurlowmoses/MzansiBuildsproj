@@ -1,16 +1,12 @@
 
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { createProject } from "../api/backendClient";
-import { storage } from "../firebase_config";
-import { uploadImageFile } from "../utils/imageUpload";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase_config";
 import "../styles/newproject.css";
 
 const NewProjectPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -22,8 +18,6 @@ const NewProjectPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
-  const [codeImageFile, setCodeImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +29,7 @@ const NewProjectPage = () => {
     setLoading(true);
     setError("");
 
-    if (!user) {
+    if (!auth.currentUser) {
       setError("You must be logged in to create a project.");
       setLoading(false);
       return;
@@ -48,27 +42,19 @@ const NewProjectPage = () => {
         .map((t) => t.trim())
         .filter((t) => t);
 
-      let codeImageUrl = "";
-      if (codeImageFile) {
-        codeImageUrl = await uploadImageFile({
-          file: codeImageFile,
-          storage,
-          pathPrefix: `project-code-images/${user.uid}`,
-        });
-      }
-
-      await createProject({
+      await addDoc(collection(db, "projects"), {
         title: formData.title,
         description: formData.description,
         techStack: techArray,
         stage: formData.stage,
         supportNeeded: formData.supportNeeded,
-        codeImageUrl,
-        userPhotoURL: user.photoURL || "",
+        userId: auth.currentUser.uid,
+        userName: auth.currentUser.displayName || "Anonymous",
+        completed: formData.stage === "completed",
+        createdAt: serverTimestamp(),
       });
 
-      // Redirect to feed after backend saves the project
-      navigate("/");
+      navigate("/feed");
 
     } catch (err) {
       setError(`Failed to create project: ${err?.message || "Unknown error"}`);
@@ -151,22 +137,6 @@ const NewProjectPage = () => {
               placeholder="e.g. Looking for a frontend developer, need feedback on my API..."
               rows={3}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="codeImage">Code screenshot (optional)</label>
-            <input
-              id="codeImage"
-              name="codeImage"
-              type="file"
-              accept="image/*"
-              onChange={(event) => {
-                const file = event.target.files?.[0] || null;
-                setCodeImageFile(file);
-                setImagePreview(file ? URL.createObjectURL(file) : "");
-              }}
-            />
-            {imagePreview ? <img src={imagePreview} alt="Code preview" className="code-image-preview" /> : null}
           </div>
 
           {error && <p className="np-error">{error}</p>}

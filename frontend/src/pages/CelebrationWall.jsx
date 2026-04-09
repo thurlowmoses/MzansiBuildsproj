@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { db } from "../firebase_config";
 import "../styles/celebration-wall.css";
 
+function getTimestampSeconds(value) {
+	if (!value) return 0;
+	if (typeof value?.seconds === "number") return value.seconds;
+	const parsed = Math.floor(new Date(value).getTime() / 1000);
+	return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 function CelebrationWall() {
 	const [projects, setProjects] = useState([]);
+	const [breakthroughs, setBreakthroughs] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 
@@ -28,13 +36,52 @@ function CelebrationWall() {
 		return unsubscribe;
 	}, []);
 
+	useEffect(() => {
+		const breakthroughsQuery = query(collectionGroup(db, "milestones"));
+
+		const unsubscribe = onSnapshot(
+			breakthroughsQuery,
+			(snapshot) => {
+				const entries = snapshot.docs.map((entry) => {
+					const row = entry.data() || {};
+					const projectId = entry.ref.parent.parent?.id || "";
+					return {
+						id: entry.id,
+						projectId,
+						status: row.status || "",
+						title: row.title || "Milestone completed",
+						note: row.note || "",
+						createdByName: row.createdByName || "Developer",
+						updatedAt: row.updatedAt,
+						createdAt: row.createdAt,
+					};
+				});
+
+				setBreakthroughs(entries.filter((milestone) => milestone.status === "done"));
+			},
+			(err) => {
+				setError(err?.message || "Could not load milestone breakthroughs.");
+			}
+		);
+
+		return unsubscribe;
+	}, []);
+
 	const sortedProjects = useMemo(() => {
 		return [...projects].sort((a, b) => {
-			const aSeconds = a?.completedAt?.seconds || 0;
-			const bSeconds = b?.completedAt?.seconds || 0;
+			const aSeconds = getTimestampSeconds(a?.completedAt);
+			const bSeconds = getTimestampSeconds(b?.completedAt);
 			return bSeconds - aSeconds;
 		});
 	}, [projects]);
+
+	const sortedBreakthroughs = useMemo(() => {
+		return [...breakthroughs].sort((a, b) => {
+			const aSeconds = getTimestampSeconds(a?.updatedAt || a?.createdAt);
+			const bSeconds = getTimestampSeconds(b?.updatedAt || b?.createdAt);
+			return bSeconds - aSeconds;
+		});
+	}, [breakthroughs]);
 
 	return (
 		<main className="celebration-page">
@@ -69,6 +116,28 @@ function CelebrationWall() {
 							</Link>
 						</article>
 					))}
+				</section>
+
+				<section className="celebration-breakthroughs">
+					<h2 className="celebration-breakthrough-title">Breakthrough Milestones</h2>
+					{sortedBreakthroughs.length === 0 ? (
+						<p>No breakthroughs yet. Mark milestones as done to celebrate wins.</p>
+					) : (
+						<div className="celebration-grid">
+							{sortedBreakthroughs.map((milestone) => (
+								<article key={`${milestone.projectId}-${milestone.id}`} className="celebration-card">
+									<h2>{milestone.title}</h2>
+									<p>{milestone.note || "Major progress unlocked."}</p>
+									<p className="celebration-meta">Breakthrough by {milestone.createdByName}</p>
+									{milestone.projectId ? (
+										<Link to={`/projects/${milestone.projectId}`} className="celebration-link">
+											View Project
+										</Link>
+									) : null}
+								</article>
+							))}
+						</div>
+					)}
 				</section>
 			</section>
 		</main>
