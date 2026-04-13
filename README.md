@@ -2,16 +2,12 @@
 
 MzansiBuildsproj is a full-stack builder platform for sharing projects, following developers, sending direct messages, and tracking progress in public.
 
-For interview answers, file-by-file notes, backend architecture, testing, security, and ethical AI guidance, see [docs/CLAUDE_INTERVIEW_GUIDE.md](docs/CLAUDE_INTERVIEW_GUIDE.md).
-
-
 ## Structure
 
 - `frontend/` React app with the social UI, feed, messages, and profile pages.
 - `backend/` FastAPI service for authenticated reads and writes.
 - `dataconnect/` Firebase Data Connect schema, seed data, and examples.
 - `functions/` Firebase Functions starter code.
-
 
 ## Local Setup
 
