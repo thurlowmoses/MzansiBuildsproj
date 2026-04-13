@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
@@ -8,6 +11,7 @@ from firebase_admin_config import get_firestore_client
 router = APIRouter()
 
 
+# Defines the UpdateProfileRequest class.
 class UpdateProfileRequest(BaseModel):
 	# Profile fields the frontend can update.
 	displayName: str | None = None
@@ -16,12 +20,14 @@ class UpdateProfileRequest(BaseModel):
 	isPrivate: bool | None = None
 
 
+# Defines the FollowRequest class.
 class FollowRequest(BaseModel):
 	# Request to follow another user.
 	targetUserId: str
 
 
 @router.get("/me")
+# Implements get my profile.
 def get_my_profile(user: CurrentUser = CurrentUserDep):
 	# Return the saved profile or a safe default.
 	db = get_firestore_client()
@@ -48,6 +54,7 @@ def get_my_profile(user: CurrentUser = CurrentUserDep):
 
 
 @router.patch("/me")
+# Implements update my profile.
 def update_my_profile(payload: UpdateProfileRequest, user: CurrentUser = CurrentUserDep):
 	# Merge only the fields that were sent.
 	db = get_firestore_client()
@@ -65,6 +72,7 @@ def update_my_profile(payload: UpdateProfileRequest, user: CurrentUser = Current
 
 
 @router.post("/follow")
+# Implements follow user.
 def follow_user(payload: FollowRequest, user: CurrentUser = CurrentUserDep):
 	# Create a follow relationship and send notification.
 	db = get_firestore_client()
@@ -105,6 +113,7 @@ def follow_user(payload: FollowRequest, user: CurrentUser = CurrentUserDep):
 
 
 @router.delete("/follow/{target_id}")
+# Implements unfollow user.
 def unfollow_user(target_id: str, user: CurrentUser = CurrentUserDep):
 	# Remove follow relationship.
 	db = get_firestore_client()
@@ -115,3 +124,4 @@ def unfollow_user(target_id: str, user: CurrentUser = CurrentUserDep):
 		doc.reference.delete()
 
 	return {"message": "Unfollowed user", "targetId": target_id}
+

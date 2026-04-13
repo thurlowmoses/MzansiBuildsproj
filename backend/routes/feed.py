@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 from fastapi import APIRouter, Query
 
 from auth import CurrentUser, CurrentUserDep
@@ -9,6 +12,7 @@ router = APIRouter()
 
 
 @router.get("/activities")
+# Implements list activity feed.
 def list_activity_feed(
 	user: CurrentUser = CurrentUserDep,
 	limit: int = Query(default=20, ge=1, le=50),

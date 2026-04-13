@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
@@ -11,6 +14,7 @@ router = APIRouter()
 ALLOWED_STAGES = {"idea", "building", "beta", "completed"}
 
 
+# Defines the ProjectCreateRequest class.
 class ProjectCreateRequest(BaseModel):
 	# Keep project creation input bounded.
 	title: str = Field(min_length=3, max_length=120)
@@ -20,6 +24,7 @@ class ProjectCreateRequest(BaseModel):
 	supportNeeded: str = ""
 
 
+# Defines the ProjectUpdateRequest class.
 class ProjectUpdateRequest(BaseModel):
 	title: str | None = None
 	description: str | None = None
@@ -28,10 +33,12 @@ class ProjectUpdateRequest(BaseModel):
 	supportNeeded: str | None = None
 
 
+# Defines the CompletionRequest class.
 class CompletionRequest(BaseModel):
 	complete: bool = True
 
 
+# Implements get project or 404.
 def _get_project_or_404(project_id: str):
 	# Shared lookup helper for project routes.
 	db = get_firestore_client()
@@ -41,12 +48,14 @@ def _get_project_or_404(project_id: str):
 	return snapshot
 
 
+# Implements validate stage.
 def _validate_stage(stage: str | None) -> None:
 	if stage is not None and stage not in ALLOWED_STAGES:
 		raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid stage")
 
 
 @router.post("/")
+# Implements create project.
 def create_project(payload: ProjectCreateRequest, user: CurrentUser = CurrentUserDep):
 	# New projects are owned by the authenticated user.
 	_validate_stage(payload.stage)
@@ -88,6 +97,7 @@ def create_project(payload: ProjectCreateRequest, user: CurrentUser = CurrentUse
 
 
 @router.get("/")
+# Implements list projects.
 def list_projects(
 	user: CurrentUser = CurrentUserDep,
 	limit: int = Query(default=20, ge=1, le=50),
@@ -113,6 +123,7 @@ def list_projects(
 
 
 @router.get("/{project_id}")
+# Implements get project.
 def get_project(project_id: str, user: CurrentUser = CurrentUserDep):
 	snapshot = _get_project_or_404(project_id)
 	project = serialize_snapshot(snapshot)
@@ -121,6 +132,7 @@ def get_project(project_id: str, user: CurrentUser = CurrentUserDep):
 
 
 @router.patch("/{project_id}")
+# Implements update project.
 def update_project(project_id: str, payload: ProjectUpdateRequest, user: CurrentUser = CurrentUserDep):
 	# Only the owner can edit their project.
 	_validate_stage(payload.stage)
@@ -138,6 +150,7 @@ def update_project(project_id: str, payload: ProjectUpdateRequest, user: Current
 	return {"message": "Project updated", "id": project_id}
 
 
+# Implements delete project subcollection.
 def _delete_project_subcollection(db, project_id: str, collection_name: str) -> None:
 	collection_ref = db.collection("projects").document(project_id).collection(collection_name)
 	for snapshot in collection_ref.stream():
@@ -145,6 +158,7 @@ def _delete_project_subcollection(db, project_id: str, collection_name: str) -> 
 
 
 @router.delete("/{project_id}")
+# Implements delete project.
 def delete_project(project_id: str, user: CurrentUser = CurrentUserDep):
 	# Only the owner can delete their project.
 	db = get_firestore_client()
@@ -168,6 +182,7 @@ def delete_project(project_id: str, user: CurrentUser = CurrentUserDep):
 
 
 @router.post("/{project_id}/complete")
+# Implements complete project.
 def complete_project(project_id: str, payload: CompletionRequest, user: CurrentUser = CurrentUserDep):
 	# Completion status controls Celebration Wall visibility.
 	db = get_firestore_client()
@@ -205,3 +220,4 @@ def complete_project(project_id: str, payload: CompletionRequest, user: CurrentU
 		)
 
 	return {"message": "Project completion updated", "id": project_id, "completed": is_complete}
+

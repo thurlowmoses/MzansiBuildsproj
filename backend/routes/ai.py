@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import asyncio
 import json
 import os
@@ -11,10 +14,12 @@ from pydantic import BaseModel, Field
 router = APIRouter()
 
 
+# Defines the HelpStreamRequest class.
 class HelpStreamRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
 
 
+# Implements fallback response.
 def _fallback_response(question: str) -> str:
     q = question.lower()
 
@@ -54,6 +59,7 @@ def _fallback_response(question: str) -> str:
     )
 
 
+# Implements openai response.
 def _openai_response(question: str) -> str | None:
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     model = os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip()
@@ -116,3 +122,4 @@ async def stream_help(payload: HelpStreamRequest):
     question = payload.question.strip()
     answer = _openai_response(question) or _fallback_response(question)
     return StreamingResponse(_stream_text(answer), media_type="text/plain; charset=utf-8")
+

@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
@@ -9,15 +12,18 @@ from routes._helpers import serialize_snapshot
 router = APIRouter()
 
 
+# Defines the CommentCreateRequest class.
 class CommentCreateRequest(BaseModel):
 	# Short comment payload for project threads.
 	content: str = Field(min_length=1, max_length=2000)
 
 
+# Defines the CollaborationRequestCreateRequest class.
 class CollaborationRequestCreateRequest(BaseModel):
 	message: str = Field(min_length=1, max_length=2000)
 
 
+# Implements ensure project exists.
 def _ensure_project_exists(project_id: str):
 	# Fail fast when the parent project is missing.
 	db = get_firestore_client()
@@ -28,6 +34,7 @@ def _ensure_project_exists(project_id: str):
 
 
 @router.post("/projects/{project_id}/comments")
+# Implements create comment.
 def create_comment(project_id: str, payload: CommentCreateRequest, user: CurrentUser = CurrentUserDep):
 	# Store comments under the project document.
 	db = get_firestore_client()
@@ -91,6 +98,7 @@ def create_comment(project_id: str, payload: CommentCreateRequest, user: Current
 
 
 @router.get("/projects/{project_id}/comments")
+# Implements list comments.
 def list_comments(
 	project_id: str,
 	user: CurrentUser = CurrentUserDep,
@@ -125,6 +133,7 @@ def list_comments(
 
 
 @router.post("/projects/{project_id}/collaboration-requests")
+# Implements create collaboration request.
 def create_collaboration_request(
 	project_id: str,
 	payload: CollaborationRequestCreateRequest,
@@ -199,6 +208,7 @@ def create_collaboration_request(
 
 
 @router.get("/projects/{project_id}/collaboration-requests")
+# Implements list collaboration requests.
 def list_collaboration_requests(
 	project_id: str,
 	user: CurrentUser = CurrentUserDep,
@@ -241,3 +251,4 @@ def list_collaboration_requests(
 		"count": len(items),
 		"viewer": user.uid,
 	}
+

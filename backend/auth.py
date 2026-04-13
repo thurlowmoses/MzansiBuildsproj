@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 from dataclasses import dataclass
 
 from fastapi import Depends, Header, HTTPException, status
@@ -7,12 +10,14 @@ from firebase_admin_config import verify_firebase_token
 
 
 @dataclass
+# Defines the CurrentUser class.
 class CurrentUser:
     # Minimal identity extracted from Firebase.
     uid: str
     email: str | None
     name: str | None
 
+# Implements parse bearer token.
 def _parse_bearer_token(authorization: str | None) -> str:
     # Reject missing or malformed auth headers early.
     if not authorization:
@@ -38,6 +43,7 @@ def _parse_bearer_token(authorization: str | None) -> str:
     return token
 
 
+# Implements get current user.
 def get_current_user(authorization: str | None = Header(default=None)) -> CurrentUser:
     # Verify the Firebase token and expose a small user object.
     token = _parse_bearer_token(authorization)
@@ -93,3 +99,4 @@ def get_current_user(authorization: str | None = Header(default=None)) -> Curren
 
 
 CurrentUserDep = Depends(get_current_user)
+

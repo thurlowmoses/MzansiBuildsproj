@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import sys
 import unittest
 from pathlib import Path
@@ -13,20 +16,26 @@ from main import app
 from routes._helpers import is_breakthrough_milestone
 
 
+# Defines the BackendHardeningTests class.
 class BackendHardeningTests(unittest.TestCase):
+    # Implements setUp.
     def setUp(self):
         self.client = TestClient(app)
 
+    # Implements auth headers.
     def _auth_headers(self):
         return {"Authorization": "Bearer fake-token"}
 
+    # Implements mock user.
     def _mock_user(self, uid="user-1", email="user@example.com", name="Test User"):
         return {"uid": uid, "email": email, "name": name}
 
+    # Implements test comments list requires auth.
     def test_comments_list_requires_auth(self):
         response = self.client.get("/projects/project-1/comments")
         self.assertEqual(response.status_code, 401)
 
+    # Implements test projects list uses pagination.
     def test_projects_list_uses_pagination(self):
         db = MagicMock()
         projects_collection = MagicMock()
@@ -60,6 +69,7 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(payload["nextCursor"], "project-2")
         self.assertEqual(payload["viewer"], "user-1")
 
+    # Implements test collaboration requests are owner only.
     def test_collaboration_requests_are_owner_only(self):
         db = MagicMock()
         project_collection = MagicMock()
@@ -81,6 +91,7 @@ class BackendHardeningTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    # Implements test comment list returns paged payload for authenticated user.
     def test_comment_list_returns_paged_payload_for_authenticated_user(self):
         db = MagicMock()
         projects_collection = MagicMock()
@@ -112,11 +123,13 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(payload["nextCursor"], "comment-1")
         self.assertEqual(payload["viewer"], "user-1")
 
+    # Implements test complete project marks project completed.
     def test_complete_project_marks_project_completed(self):
         db = MagicMock()
         projects_collection = MagicMock()
         activities_collection = MagicMock()
 
+        # Implements collection side effect.
         def collection_side_effect(name):
             if name == "projects":
                 return projects_collection
@@ -145,12 +158,14 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertTrue(payload["completed"])
         projects_collection.document.return_value.set.assert_called_once()
 
+    # Implements test delete project removes owned project.
     def test_delete_project_removes_owned_project(self):
         db = MagicMock()
         projects_collection = MagicMock()
         activities_collection = MagicMock()
         notifications_collection = MagicMock()
 
+        # Implements collection side effect.
         def collection_side_effect(name):
             if name == "projects":
                 return projects_collection
@@ -190,6 +205,7 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         projects_collection.document.return_value.delete.assert_called_once()
 
+    # Implements test delete project blocks non owner.
     def test_delete_project_blocks_non_owner(self):
         db = MagicMock()
         projects_collection = MagicMock()
@@ -207,6 +223,7 @@ class BackendHardeningTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 403)
 
+    # Implements test profile update merges fields.
     def test_profile_update_merges_fields(self):
         db = MagicMock()
         users_collection = MagicMock()
@@ -229,12 +246,14 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(payload["applied"]["displayName"], "Updated User")
         user_doc.set.assert_called_once()
 
+    # Implements test comment creation writes notification.
     def test_comment_creation_writes_notification(self):
         db = MagicMock()
         projects_collection = MagicMock()
         notifications_collection = MagicMock()
         activities_collection = MagicMock()
 
+        # Implements collection side effect.
         def collection_side_effect(name):
             if name == "projects":
                 return projects_collection
@@ -268,12 +287,14 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(notification_doc.set.called)
 
+    # Implements test collaboration request writes notification.
     def test_collaboration_request_writes_notification(self):
         db = MagicMock()
         projects_collection = MagicMock()
         notifications_collection = MagicMock()
         activities_collection = MagicMock()
 
+        # Implements collection side effect.
         def collection_side_effect(name):
             if name == "projects":
                 return projects_collection
@@ -307,16 +328,19 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(notification_doc.set.called)
 
+    # Implements test breakthrough helper detects done milestones.
     def test_breakthrough_helper_detects_done_milestones(self):
         self.assertTrue(is_breakthrough_milestone({"status": "done"}))
         self.assertFalse(is_breakthrough_milestone({"status": "todo"}))
 
+    # Implements test follow creates notification.
     def test_follow_creates_notification(self):
         db = MagicMock()
         follows_collection = MagicMock()
         users_collection = MagicMock()
         notifications_collection = MagicMock()
 
+        # Implements collection side effect.
         def collection_side_effect(name):
             if name == "follows":
                 return follows_collection
@@ -351,6 +375,7 @@ class BackendHardeningTests(unittest.TestCase):
         self.assertTrue(follow_doc.set.called)
         self.assertTrue(notification_doc.set.called)
 
+    # Implements test follow prevents self follow.
     def test_follow_prevents_self_follow(self):
         db = MagicMock()
 

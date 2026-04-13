@@ -1,3 +1,6 @@
+# Purpose: Project source file used by the MzansiBuilds application.
+# Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -7,6 +10,7 @@ from firebase_admin import auth, credentials, firestore
 
 
 @lru_cache
+# Implements get firebase app.
 def get_firebase_app() -> firebase_admin.App:
     """Initialize and return a singleton Firebase Admin app."""
     # Prefer an already-initialized app when available.
@@ -41,13 +45,16 @@ def get_firebase_app() -> firebase_admin.App:
 
 
 @lru_cache
+# Implements get firestore client.
 def get_firestore_client() -> firestore.Client:
     # Client setup stays cached for the whole process.
     get_firebase_app()
     return firestore.client()
 
 
+# Implements verify firebase token.
 def verify_firebase_token(id_token: str) -> dict:
     # Firebase Admin handles signature and expiry checks.
     get_firebase_app()
     return auth.verify_id_token(id_token, check_revoked=False, clock_skew_seconds=60)
+
