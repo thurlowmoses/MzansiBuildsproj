@@ -2,7 +2,8 @@
 
 MzansiBuildsproj is a full-stack builder platform for sharing projects, following developers, sending direct messages, and tracking progress in public.
 
-For interview answers, file-by-file notes, backend architecture, testing, security, and ethical AI guidance, see [docs/CLAUDE_INTERVIEW_GUIDE.md](docs/CLAU_INTERVIEW_GUIDE.md).
+For interview answers, file-by-file notes, backend architecture, testing, security, and ethical AI guidance, see [docs/CLAUDE_INTERVIEW_GUIDE.md](docs/CLAUDE_INTERVIEW_GUIDE.md).
+
 
 ## Structure
 
@@ -10,12 +11,12 @@ For interview answers, file-by-file notes, backend architecture, testing, securi
 - `backend/` FastAPI service for authenticated reads and writes.
 - `dataconnect/` Firebase Data Connect schema, seed data, and examples.
 - `functions/` Firebase Functions starter code.
-- `docs/` Project overview and the detailed interview guide.
+
 
 ## Local Setup
 
 1. Install dependencies in the frontend and backend folders.
-2. Configure Firebase environment variables.
+2. Configure environment variables using `.env.example`, `frontend/.env.example`, and `backend/.env.example`.
 3. Run the frontend and backend locally.
 
 ## Continuous Delivery
