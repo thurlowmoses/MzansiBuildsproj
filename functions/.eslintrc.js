@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 module.exports = {
   env: {
     es6: true,
@@ -26,3 +29,4 @@ module.exports = {
   ],
   globals: {},
 };
+
