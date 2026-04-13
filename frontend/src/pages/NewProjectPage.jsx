@@ -1,10 +1,16 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase_config";
+import { auth, db, storage } from "../firebase_config";
+import { formatAttachmentSize } from "../utils/fileUtils";
+import { uploadAttachmentFile } from "../utils/fileUpload";
 import "../styles/newproject.css";
 
+// Handles NewProjectPage.
 const NewProjectPage = () => {
   const navigate = useNavigate();
 
@@ -18,12 +24,15 @@ const NewProjectPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
 
+  // Handles onChange.
   const onChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handles onSubmit.
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -36,11 +45,18 @@ const NewProjectPage = () => {
     }
 
     try {
-      // Convert "React, Python, Firebase" → ["React", "Python", "Firebase"]
       const techArray = formData.techStack
         .split(",")
         .map((t) => t.trim())
         .filter((t) => t);
+
+      const attachment = selectedFile
+        ? await uploadAttachmentFile({
+            file: selectedFile,
+            storage,
+            pathPrefix: `project-attachments/${auth.currentUser.uid}`,
+          })
+        : null;
 
       await addDoc(collection(db, "projects"), {
         title: formData.title,
@@ -50,6 +66,8 @@ const NewProjectPage = () => {
         supportNeeded: formData.supportNeeded,
         userId: auth.currentUser.uid,
         userName: auth.currentUser.displayName || "Anonymous",
+        userPhotoURL: auth.currentUser?.photoURL || "",
+        attachment,
         completed: formData.stage === "completed",
         createdAt: serverTimestamp(),
       });
@@ -67,14 +85,12 @@ const NewProjectPage = () => {
   return (
     <div className="np-page">
       <div className="np-container">
-
         <h1 className="np-title">Start building in public</h1>
         <p className="np-subtitle">
           Share what you are working on. The community wants to see it.
         </p>
 
         <form onSubmit={onSubmit} className="np-form">
-
           <div className="form-group">
             <label htmlFor="title">Project title *</label>
             <input
@@ -95,7 +111,7 @@ const NewProjectPage = () => {
               value={formData.description}
               onChange={onChange}
               required
-              placeholder="Describe your project — what problem it solves, who it is for..."
+              placeholder="Describe your project - what problem it solves, who it is for..."
               rows={4}
             />
           </div>
@@ -120,10 +136,10 @@ const NewProjectPage = () => {
               value={formData.stage}
               onChange={onChange}
             >
-              <option value="idea">💡 Idea — just getting started</option>
-              <option value="building">🔨 Building — actively coding</option>
-              <option value="beta">🚀 Beta — testing with users</option>
-              <option value="completed">✅ Completed — shipped it!</option>
+              <option value="idea">💡 Idea - just getting started</option>
+              <option value="building">🔨 Building - actively coding</option>
+              <option value="beta">🚀 Beta - testing with users</option>
+              <option value="completed">✅ Completed - shipped it!</option>
             </select>
           </div>
 
@@ -139,16 +155,26 @@ const NewProjectPage = () => {
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="projectAttachment">Optional attachment</label>
+            <input
+              id="projectAttachment"
+              type="file"
+              onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
+            />
+            <p className="form-hint">Share an image, PDF, text, or other file (max 15MB).</p>
+            {selectedFile ? (
+              <p className="np-file-meta">
+                Selected: {selectedFile.name}{formatAttachmentSize(selectedFile.size) ? ` (${formatAttachmentSize(selectedFile.size)})` : ""}
+              </p>
+            ) : null}
+          </div>
+
           {error && <p className="np-error">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="np-button"
-          >
+          <button type="submit" disabled={loading} className="np-button">
             {loading ? "Posting project..." : "Post my project"}
           </button>
-
         </form>
       </div>
     </div>

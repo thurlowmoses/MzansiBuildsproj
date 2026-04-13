@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 const HELP_INTENTS = [
   {
     id: "create-project",
@@ -52,6 +55,7 @@ const HELP_INTENTS = [
   },
 ];
 
+// Handles FALLBACK RESPONSE.
 const FALLBACK_RESPONSE = {
   title: "General help",
   answer:
@@ -63,6 +67,7 @@ const FALLBACK_RESPONSE = {
   ],
 };
 
+// Handles scoreIntent.
 function scoreIntent(question, intent) {
   const q = question.toLowerCase();
   let score = 0;
@@ -76,6 +81,7 @@ function scoreIntent(question, intent) {
   return score;
 }
 
+// Handles getHelpResponse.
 export function getHelpResponse(question) {
   const text = (question || "").trim();
   if (!text) {
@@ -111,3 +117,4 @@ export const suggestedQuestions = [
   "How do I post milestones and comments?",
   "How do I reset my password?",
 ];
+

@@ -1,16 +1,14 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { db } from "../firebase_config";
+import { getTimestampSeconds } from "../utils/timeUtils";
 import "../styles/celebration-wall.css";
 
-function getTimestampSeconds(value) {
-	if (!value) return 0;
-	if (typeof value?.seconds === "number") return value.seconds;
-	const parsed = Math.floor(new Date(value).getTime() / 1000);
-	return Number.isNaN(parsed) ? 0 : parsed;
-}
-
+// Handles CelebrationWall.
 function CelebrationWall() {
 	const [projects, setProjects] = useState([]);
 	const [breakthroughs, setBreakthroughs] = useState([]);
@@ -145,3 +143,4 @@ function CelebrationWall() {
 }
 
 export default CelebrationWall;
+

@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { auth } from "../firebase_config";
 
 const API_BASE = (
@@ -5,6 +8,14 @@ const API_BASE = (
 ).replace(/\/$/, "");
 
 const REQUEST_TIMEOUT_MS = 15000;
+
+function toRateLimitMessage(response, data) {
+  const retryAfter = response.headers?.get("Retry-After");
+  if (retryAfter) {
+    return `Too many requests. Please try again in ${retryAfter} seconds.`;
+  }
+  return data?.detail || data?.message || "Too many requests. Please try again shortly.";
+}
 
 async function getIdTokenOrThrow() {
   const currentUser = auth.currentUser;
@@ -27,6 +38,7 @@ async function refreshIdTokenOrThrow() {
 }
 
 async function request(path, { method = "GET", body, requiresAuth = true } = {}) {
+  // Handles headers.
   const headers = {
     "Content-Type": "application/json",
   };
@@ -69,7 +81,10 @@ async function request(path, { method = "GET", body, requiresAuth = true } = {})
 
       if (!retryResponse.ok) {
         const retryData = await retryResponse.json().catch(() => ({}));
-        const retryDetail = retryData?.detail || retryData?.message || `Request failed (${retryResponse.status})`;
+        const retryDetail =
+          retryResponse.status === 429
+            ? toRateLimitMessage(retryResponse, retryData)
+            : retryData?.detail || retryData?.message || `Request failed (${retryResponse.status})`;
 
         throw new Error(retryDetail);
       }
@@ -83,37 +98,47 @@ async function request(path, { method = "GET", body, requiresAuth = true } = {})
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const detail = data?.detail || data?.message || `Request failed (${response.status})`;
+    const detail =
+      response.status === 429
+        ? toRateLimitMessage(response, data)
+        : data?.detail || data?.message || `Request failed (${response.status})`;
     throw new Error(detail);
   }
 
   return data;
 }
 
+// Handles createProject.
 export function createProject(payload) {
   return request("/projects", { method: "POST", body: payload });
 }
 
+// Handles fetchProject.
 export function fetchProject(projectId) {
   return request(`/projects/${projectId}`, { method: "GET" });
 }
 
+// Handles updateProject.
 export function updateProject(projectId, payload) {
   return request(`/projects/${projectId}`, { method: "PATCH", body: payload });
 }
 
+// Handles deleteProject.
 export function deleteProject(projectId) {
   return request(`/projects/${projectId}`, { method: "DELETE" });
 }
 
+// Handles fetchMyProfile.
 export function fetchMyProfile() {
   return request("/users/me", { method: "GET" });
 }
 
+// Handles updateMyProfile.
 export function updateMyProfile(payload) {
   return request("/users/me", { method: "PATCH", body: payload });
 }
 
+// Handles fetchFeedActivities.
 export function fetchFeedActivities({ limit = 20, after } = {}) {
   const params = new URLSearchParams();
   params.set("limit", String(limit));
@@ -123,10 +148,12 @@ export function fetchFeedActivities({ limit = 20, after } = {}) {
   return request(`/feed/activities?${params.toString()}`, { method: "GET" });
 }
 
+// Handles followUser.
 export function followUser(targetUserId) {
   return request("/users/follow", { method: "POST", body: { targetUserId } });
 }
 
+// Handles unfollowUser.
 export function unfollowUser(targetUserId) {
   return request(`/users/follow/${targetUserId}`, { method: "DELETE" });
 }
@@ -140,8 +167,16 @@ export async function streamHelpResponse(question, onChunk) {
     body: JSON.stringify({ question }),
   });
 
-  if (!response.ok || !response.body) {
-    throw new Error(`Assistant request failed (${response.status})`);
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    if (response.status === 429) {
+      throw new Error(toRateLimitMessage(response, payload));
+    }
+    throw new Error(payload?.detail || payload?.message || `Assistant request failed (${response.status})`);
+  }
+
+  if (!response.body) {
+    throw new Error("Assistant request failed: empty response body.");
   }
 
   const reader = response.body.getReader();
@@ -156,3 +191,4 @@ export async function streamHelpResponse(question, onChunk) {
     }
   }
 }
+

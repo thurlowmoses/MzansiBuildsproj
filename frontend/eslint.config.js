@@ -1,3 +1,6 @@
+// Purpose: Implements module-level logic for this feature area.
+// Notes: Auto-annotated to improve maintainability and onboarding.
+
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'

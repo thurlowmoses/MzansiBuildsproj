@@ -1,7 +1,11 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* ====================================
    FUTURISTIC ICON NAVBAR
    ==================================== */
 
+/* Styles for .navbar-instagram. */
 .navbar-instagram {
   position: sticky;
   top: 0;
@@ -12,6 +16,7 @@
   backdrop-filter: blur(10px);
 }
 
+/* Styles for .navbar-notification-pop. */
 .navbar-notification-pop {
   position: fixed;
   top: 14px;
@@ -31,6 +36,7 @@
   animation: pop-slide-in 0.25s ease;
 }
 
+/* Styles for .navbar-notification-main. */
 .navbar-notification-main {
   border: none;
   background: transparent;
@@ -43,10 +49,12 @@
   flex: 1;
 }
 
+/* Styles for .navbar-notification-main:hover. */
 .navbar-notification-main:hover {
   opacity: 0.95;
 }
 
+/* Styles for .navbar-notification-message. */
 .navbar-notification-message {
   border: 1px solid rgba(74, 222, 128, 0.6);
   background: rgba(74, 222, 128, 0.14);
@@ -58,11 +66,13 @@
   white-space: nowrap;
 }
 
+/* Styles for .navbar-notification-message:hover. */
 .navbar-notification-message:hover {
   background: rgba(74, 222, 128, 0.28);
   border-color: rgba(74, 222, 128, 0.85);
 }
 
+/* Styles for .navbar-notification-pop-dot. */
 .navbar-notification-pop-dot {
   width: 8px;
   height: 8px;
@@ -72,17 +82,21 @@
   flex: none;
 }
 
+/* Styles for @keyframes pop-slide-in. */
 @keyframes pop-slide-in {
+/* Styles for from. */
   from {
     transform: translateY(-6px);
     opacity: 0;
   }
+/* Styles for to. */
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
+/* Styles for .navbar-wrapper. */
 .navbar-wrapper {
   max-width: 1200px;
   margin: 0 auto;
@@ -93,6 +107,7 @@
   padding: 10px var(--spacing-lg);
 }
 
+/* Styles for .navbar-logo. */
 .navbar-logo {
   display: inline-flex;
   align-items: center;
@@ -103,11 +118,13 @@
   letter-spacing: 0.2px;
 }
 
+/* Styles for .navbar-logo:hover. */
 .navbar-logo:hover {
   color: #86efac;
   text-decoration: none;
 }
 
+/* Styles for .logo-icon. */
 .logo-icon {
   width: 28px;
   height: 28px;
@@ -121,16 +138,19 @@
 }
 
 .logo-icon svg,
+/* Styles for .nav-icon svg. */
 .nav-icon svg {
   width: 18px;
   height: 18px;
   fill: currentColor;
 }
 
+/* Styles for .logo-text. */
 .logo-text {
   color: #ffffff;
 }
 
+/* Styles for .navbar-search input. */
 .navbar-search input {
   width: 100%;
   background: rgba(0, 0, 0, 0.85);
@@ -142,16 +162,19 @@
   text-align: center;
 }
 
+/* Styles for .navbar-search input:focus. */
 .navbar-search input:focus {
   outline: none;
   box-shadow: none;
   border-color: rgba(16, 185, 129, 0.65);
 }
 
+/* Styles for .navbar-search-wrap. */
 .navbar-search-wrap {
   position: relative;
 }
 
+/* Styles for .search-results-popover. */
 .search-results-popover {
   position: absolute;
   top: calc(100% + 8px);
@@ -169,11 +192,13 @@
   z-index: 200;
 }
 
+/* Styles for .search-group. */
 .search-group {
   display: grid;
   gap: 6px;
 }
 
+/* Styles for .search-group-title. */
 .search-group-title {
   margin: 0;
   font-size: 11px;
@@ -182,6 +207,7 @@
   color: #86efac;
 }
 
+/* Styles for .search-item. */
 .search-item {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.11);
@@ -195,21 +221,25 @@
   cursor: pointer;
 }
 
+/* Styles for .search-item:hover. */
 .search-item:hover {
   border-color: rgba(16, 185, 129, 0.7);
   background: rgba(16, 185, 129, 0.12);
 }
 
+/* Styles for .search-item-title. */
 .search-item-title {
   font-size: 13px;
   font-weight: 600;
 }
 
+/* Styles for .search-item-sub. */
 .search-item-sub {
   font-size: 11px;
   color: #d1d5db;
 }
 
+/* Styles for .search-empty. */
 .search-empty {
   margin: 0;
   font-size: 12px;
@@ -217,6 +247,7 @@
   padding: 4px 0;
 }
 
+/* Styles for .navbar-icons. */
 .navbar-icons {
   display: inline-flex;
   align-items: center;
@@ -224,6 +255,7 @@
   gap: 8px;
 }
 
+/* Styles for .nav-icon. */
 .nav-icon {
   width: 38px;
   height: 38px;
@@ -240,6 +272,7 @@
     color var(--transition-fast), background var(--transition-fast);
 }
 
+/* Styles for .nav-icon:hover. */
 .nav-icon:hover {
   transform: translateY(-1px);
   text-decoration: none;
@@ -248,20 +281,24 @@
   background: linear-gradient(145deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.08));
 }
 
+/* Styles for .nav-icon.active. */
 .nav-icon.active {
   border-color: rgba(16, 185, 129, 0.95);
   color: #bbf7d0;
   background: linear-gradient(145deg, rgba(16, 185, 129, 0.36), rgba(16, 185, 129, 0.12));
 }
 
+/* Styles for .nav-messages. */
 .nav-messages {
   position: relative;
 }
 
+/* Styles for .nav-notifications. */
 .nav-notifications {
   position: relative;
 }
 
+/* Styles for .message-badge. */
 .message-badge {
   position: absolute;
   top: -6px;
@@ -279,14 +316,17 @@
   border: 2px solid rgba(10, 16, 27, 1);
 }
 
+/* Styles for .settings-btn. */
 .settings-btn {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
 }
 
+/* Styles for .navbar-settings-container. */
 .navbar-settings-container {
   position: relative;
 }
 
+/* Styles for .settings-dropdown. */
 .settings-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -301,11 +341,13 @@
   gap: 8px;
 }
 
+/* Styles for .settings-header. */
 .settings-header {
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   padding-bottom: 8px;
 }
 
+/* Styles for .settings-title. */
 .settings-title {
   margin: 0;
   color: #f8fafc;
@@ -313,12 +355,14 @@
   font-size: 13px;
 }
 
+/* Styles for .settings-user. */
 .settings-user {
   margin: 4px 0 0;
   color: #d1d5db;
   font-size: 12px;
 }
 
+/* Styles for .settings-item. */
 .settings-item {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -331,37 +375,44 @@
   text-decoration: none;
 }
 
+/* Styles for .settings-item:hover. */
 .settings-item:hover {
   color: #a6ffd5;
   border-color: rgba(16, 185, 129, 0.7);
   text-decoration: none;
 }
 
+/* Styles for .settings-logout. */
 .settings-logout {
   color: #ffd3d3;
   border-color: rgba(239, 68, 68, 0.4);
 }
 
+/* Styles for .settings-logout:hover. */
 .settings-logout:hover {
   color: #fff;
   border-color: rgba(239, 68, 68, 0.9);
 }
 
 .settings-message,
+/* Styles for .settings-error. */
 .settings-error {
   margin: 0;
   font-size: 12px;
   line-height: 1.35;
 }
 
+/* Styles for .settings-message. */
 .settings-message {
   color: #7df0be;
 }
 
+/* Styles for .settings-error. */
 .settings-error {
   color: #ff9ca1;
 }
 
+/* Styles for .navbar-live-row. */
 .navbar-live-row {
   max-width: 1200px;
   margin: 0 auto;
@@ -372,6 +423,7 @@
   overflow: hidden;
 }
 
+/* Styles for .live-indicator. */
 .live-indicator {
   width: 8px;
   height: 8px;
@@ -380,6 +432,7 @@
   box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.15);
 }
 
+/* Styles for .live-title. */
 .live-title {
   font-size: 12px;
   color: #9ad8bf;
@@ -388,6 +441,7 @@
   flex: none;
 }
 
+/* Styles for .live-people. */
 .live-people {
   display: flex;
   align-items: center;
@@ -396,6 +450,7 @@
   padding-bottom: 2px;
 }
 
+/* Styles for .live-chip. */
 .live-chip {
   display: inline-flex;
   align-items: center;
@@ -410,6 +465,7 @@
   background: rgba(16, 185, 129, 0.14);
 }
 
+/* Styles for .live-chip:hover. */
 .live-chip:hover {
   color: #061813;
   text-decoration: none;
@@ -417,6 +473,7 @@
   border-color: #4ade80;
 }
 
+/* Styles for .live-chip-avatar. */
 .live-chip-avatar {
   width: 20px;
   height: 20px;
@@ -429,17 +486,21 @@
   flex: none;
 }
 
+/* Styles for .live-chip-initial. */
 .live-chip-initial {
   font-size: 11px;
   font-weight: 700;
 }
 
+/* Styles for .live-empty. */
 .live-empty {
   color: #8fa8c2;
   font-size: 12px;
 }
 
+/* Styles for @media (max-width: 900px). */
 @media (max-width: 900px) {
+/* Styles for .navbar-wrapper. */
   .navbar-wrapper {
     grid-template-columns: 1fr auto;
     grid-template-areas:
@@ -447,39 +508,48 @@
       "search search";
   }
 
+/* Styles for .navbar-logo. */
   .navbar-logo {
     grid-area: logo;
   }
 
+/* Styles for .navbar-search. */
   .navbar-search {
     grid-area: search;
   }
 
+/* Styles for .navbar-icons. */
   .navbar-icons {
     grid-area: icons;
   }
 }
 
+/* Styles for @media (max-width: 560px). */
 @media (max-width: 560px) {
+/* Styles for .navbar-notification-pop. */
   .navbar-notification-pop {
     padding: 9px 10px;
   }
 
+/* Styles for .navbar-notification-message. */
   .navbar-notification-message {
     padding: 5px 9px;
     font-size: 11px;
   }
 
+/* Styles for .logo-text. */
   .logo-text {
     display: none;
   }
 
   .navbar-wrapper,
+/* Styles for .navbar-live-row. */
   .navbar-live-row {
     padding-left: var(--spacing-md);
     padding-right: var(--spacing-md);
   }
 
+/* Styles for .nav-icon. */
   .nav-icon {
     width: 34px;
     height: 34px;

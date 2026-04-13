@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,12 +14,14 @@ import {
 import { db } from "../firebase_config";
 import "../styles/comments.css";
 
+// Handles CommentsSection.
 const CommentsSection = ({ projectId, project, comments, user }) => {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Handles handleSubmit.
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!text.trim() || !user) return;
@@ -108,3 +113,4 @@ const CommentsSection = ({ projectId, project, comments, user }) => {
 };
 
 export default CommentsSection;
+

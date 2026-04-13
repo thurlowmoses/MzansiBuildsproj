@@ -1,8 +1,13 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useState } from "react";
 
+// Handles CodeBlock.
 function CodeBlock({ title, language = "text", code, showCopy = true }) {
 	const [copied, setCopied] = useState(false);
 
+	// Handles handleCopy.
 	const handleCopy = async () => {
 		if (!navigator?.clipboard || !code) return;
 
@@ -32,3 +37,4 @@ function CodeBlock({ title, language = "text", code, showCopy = true }) {
 }
 
 export default CodeBlock;
+

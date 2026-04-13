@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .detail-page {
   min-height: 100vh;
   background: #0b0b0b;
@@ -5,6 +8,7 @@
   padding: 2rem 1rem;
 }
 
+/* Styles for .detail-celebration-pop. */
 .detail-celebration-pop {
   position: fixed;
   top: 16px;
@@ -23,17 +27,21 @@
   animation: detail-celebrate-pop 0.35s ease;
 }
 
+/* Styles for @keyframes detail-celebrate-pop. */
 @keyframes detail-celebrate-pop {
+/* Styles for from. */
   from {
     opacity: 0;
     transform: translateX(-50%) translateY(-8px) scale(0.96);
   }
+/* Styles for to. */
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0) scale(1);
   }
 }
 
+/* Styles for .detail-container. */
 .detail-container {
   max-width: 900px;
   margin: 0 auto;
@@ -41,6 +49,7 @@
   gap: 1rem;
 }
 
+/* Styles for .detail-header. */
 .detail-header {
   display: flex;
   justify-content: space-between;
@@ -48,10 +57,12 @@
   gap: 1rem;
 }
 
+/* Styles for .detail-header h1. */
 .detail-header h1 {
   margin: 0;
 }
 
+/* Styles for .detail-stage. */
 .detail-stage {
   text-transform: capitalize;
   background: #052e16;
@@ -63,10 +74,12 @@
 }
 
 .detail-description,
+/* Styles for .detail-meta. */
 .detail-meta {
   color: #d1d5db;
 }
 
+/* Styles for .detail-code-image. */
 .detail-code-image {
   width: 100%;
   max-height: 360px;
@@ -76,12 +89,53 @@
   margin: 0.5rem 0 0.75rem;
 }
 
+/* Styles for .detail-attachment-wrap. */
+.detail-attachment-wrap {
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* Styles for .detail-attachment-row. */
+.detail-attachment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Styles for .detail-attachment-name. */
+.detail-attachment-name {
+  margin: 0;
+  color: #d1d5db;
+}
+
+/* Styles for .detail-attachment-open. */
+.detail-attachment-open {
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.8);
+  color: #86efac;
+  background: rgba(22, 163, 74, 0.16);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.7rem;
+}
+
+/* Styles for .detail-attachment-open:hover. */
+.detail-attachment-open:hover {
+  border-color: rgba(34, 197, 94, 1);
+  background: rgba(22, 163, 74, 0.26);
+}
+
+/* Styles for .detail-tags. */
 .detail-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
+/* Styles for .detail-tag. */
 .detail-tag {
   background: #111827;
   border: 1px solid #374151;
@@ -91,6 +145,7 @@
   font-size: 0.75rem;
 }
 
+/* Styles for .detail-card. */
 .detail-card {
   background: #111;
   border: 1px solid #222;
@@ -98,17 +153,20 @@
   padding: 1rem;
 }
 
+/* Styles for .detail-card h2. */
 .detail-card h2 {
   margin-top: 0;
 }
 
 .comment-box-form,
 .request-form,
+/* Styles for .milestone-form. */
 .milestone-form {
   display: grid;
   gap: 0.6rem;
 }
 
+/* Styles for .comment-box-form label. */
 .comment-box-form label {
   color: #9ca3af;
   font-size: 0.85rem;
@@ -119,6 +177,7 @@
 .milestone-form textarea,
 .milestone-form input,
 .milestone-form select,
+/* Styles for .milestone-header select. */
 .milestone-header select {
   background: #0b0f16;
   border: 1px solid #374151;
@@ -129,6 +188,7 @@
 
 .comment-box-form button,
 .request-form button,
+/* Styles for .milestone-form button. */
 .milestone-form button {
   width: fit-content;
   background: #15803d;
@@ -141,6 +201,7 @@
 
 .comment-box-form button:disabled,
 .request-form button:disabled,
+/* Styles for .milestone-form button:disabled. */
 .milestone-form button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
@@ -148,6 +209,7 @@
 
 .comment-list,
 .request-list,
+/* Styles for .milestone-list. */
 .milestone-list {
   display: grid;
   gap: 0.65rem;
@@ -156,6 +218,7 @@
 
 .comment-item,
 .request-item,
+/* Styles for .milestone-item. */
 .milestone-item {
   background: #0b0f16;
   border: 1px solid #1f2937;
@@ -163,12 +226,14 @@
   padding: 0.75rem;
 }
 
+/* Styles for .milestone-form-row. */
 .milestone-form-row {
   display: flex;
   gap: 0.65rem;
   align-items: center;
 }
 
+/* Styles for .milestone-header. */
 .milestone-header {
   display: flex;
   justify-content: space-between;
@@ -176,17 +241,20 @@
   align-items: center;
 }
 
+/* Styles for .milestone-title. */
 .milestone-title {
   margin: 0;
   color: #e5e7eb;
   font-weight: 600;
 }
 
+/* Styles for .milestone-note. */
 .milestone-note {
   color: #9ca3af;
   margin: 0.35rem 0 0.5rem;
 }
 
+/* Styles for .milestone-delete. */
 .milestone-delete {
   background: #7f1d1d;
   border: 1px solid #991b1b;
@@ -196,27 +264,32 @@
   cursor: pointer;
 }
 
+/* Styles for .milestone-delete:disabled. */
 .milestone-delete:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
+/* Styles for .timeline-heading. */
 .timeline-heading {
   margin: 1rem 0 0.6rem;
   font-size: 1rem;
   color: #d1fae5;
 }
 
+/* Styles for .timeline-empty. */
 .timeline-empty {
   color: #9ca3af;
   margin: 0.2rem 0 0;
 }
 
+/* Styles for .timeline-list. */
 .timeline-list {
   display: grid;
   gap: 0.7rem;
 }
 
+/* Styles for .timeline-item. */
 .timeline-item {
   display: grid;
   grid-template-columns: 14px 1fr;
@@ -227,6 +300,7 @@
   padding: 0.7rem;
 }
 
+/* Styles for .timeline-dot. */
 .timeline-dot {
   width: 10px;
   height: 10px;
@@ -235,20 +309,24 @@
   background: #94a3b8;
 }
 
+/* Styles for .timeline-item.status-in-progress .timeline-dot. */
 .timeline-item.status-in-progress .timeline-dot {
   background: #f59e0b;
 }
 
+/* Styles for .timeline-item.status-done .timeline-dot. */
 .timeline-item.status-done .timeline-dot {
   background: #22c55e;
 }
 
+/* Styles for .timeline-title. */
 .timeline-title {
   margin: 0;
   color: #e5e7eb;
   font-weight: 600;
 }
 
+/* Styles for .timeline-meta. */
 .timeline-meta {
   margin: 0.2rem 0 0;
   color: #86efac;
@@ -256,24 +334,29 @@
   text-transform: capitalize;
 }
 
+/* Styles for .timeline-note. */
 .timeline-note {
   margin: 0.35rem 0 0;
   color: #9ca3af;
 }
 
+/* Styles for .comment-author. */
 .comment-author {
   color: #86efac;
   margin: 0 0 0.25rem;
 }
 
+/* Styles for .detail-error. */
 .detail-error {
   color: #ef4444;
 }
 
+/* Styles for .detail-success. */
 .detail-success {
   color: #22c55e;
 }
 
+/* Styles for .completion-button. */
 .completion-button {
   background: #15803d;
   border: 1px solid #166534;
@@ -283,16 +366,19 @@
   cursor: pointer;
 }
 
+/* Styles for .completion-button.secondary. */
 .completion-button.secondary {
   background: #1f2937;
   border-color: #374151;
 }
 
+/* Styles for .completion-button.danger. */
 .completion-button.danger {
   background: #7f1d1d;
   border-color: #991b1b;
 }
 
+/* Styles for .project-edit-form. */
 .project-edit-form {
   display: grid;
   gap: 0.75rem;
@@ -301,6 +387,7 @@
 
 .project-edit-form input,
 .project-edit-form textarea,
+/* Styles for .project-edit-form select. */
 .project-edit-form select {
   background: #0b0f16;
   border: 1px solid #374151;
@@ -312,12 +399,14 @@
 
 .project-edit-form input:focus,
 .project-edit-form textarea:focus,
+/* Styles for .project-edit-form select:focus. */
 .project-edit-form select:focus {
   outline: none;
   border-color: #10b981;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
+/* Styles for .project-edit-actions. */
 .project-edit-actions {
   display: flex;
   flex-wrap: wrap;
@@ -325,6 +414,7 @@
   margin-top: 0.5rem;
 }
 
+/* Styles for .completion-button:disabled. */
 .completion-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;

@@ -1,9 +1,13 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* ====================================
    THEME VARIABLES - Color Scheme
    Green, White, Black theme for MzansiBuilds
    Supports light and dark mode
    ==================================== */
 
+/* Styles for :root. */
 :root {
   /* Primary Colors - Green */
   --color-primary: #16a34a;

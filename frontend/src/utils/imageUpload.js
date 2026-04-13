@@ -1,15 +1,20 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const UPLOAD_TIMEOUT_MS = 60000;
 const MAX_IMAGE_DIMENSION = 1600;
 
+// Handles wait.
 function wait(ms) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
 }
 
+// Handles withTimeout.
 function withTimeout(promise, timeoutMs, timeoutMessage) {
   return Promise.race([
     promise,
@@ -19,6 +24,7 @@ function withTimeout(promise, timeoutMs, timeoutMessage) {
   ]);
 }
 
+// Handles toUploadErrorMessage.
 function toUploadErrorMessage(error) {
   if (typeof error?.message === "string" && error.message.includes("timed out")) {
     return error.message;
@@ -160,6 +166,7 @@ export async function uploadImageFile({ file, storage, pathPrefix }) {
   const uploadFile = await compressImageFile(file);
   const safeName = uploadFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
+  // Handles uploadToStorage.
   const uploadToStorage = async (targetStorage) => {
     const uploadRef = ref(targetStorage, `${pathPrefix}/${Date.now()}-${safeName}`);
     await uploadBytesWithRetry(uploadRef, uploadFile, 2);
@@ -190,3 +197,4 @@ export async function uploadImageFile({ file, storage, pathPrefix }) {
     }
   }
 }
+

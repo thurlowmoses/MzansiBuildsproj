@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useState } from "react";
 import {
   addDoc,
@@ -12,6 +15,7 @@ import { db } from "../firebase_config";
 import MilestoneTimeline from "./MilestoneTimeline";
 import "../styles/milestone.css";
 
+// Handles MilestoneSection.
 const MilestoneSection = ({ projectId, project, milestones, user }) => {
   const [milestoneForm, setMilestoneForm] = useState({ title: "", note: "", status: "todo" });
   const [loading, setLoading] = useState(false);
@@ -21,11 +25,13 @@ const MilestoneSection = ({ projectId, project, milestones, user }) => {
 
   const isOwner = project?.userId === user?.uid;
 
+  // Handles onChange.
   const onChange = (event) => {
     const { name, value } = event.target;
     setMilestoneForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handles handleCreate.
   const handleCreate = async (event) => {
     event.preventDefault();
     if (!isOwner) {
@@ -65,6 +71,7 @@ const MilestoneSection = ({ projectId, project, milestones, user }) => {
     }
   };
 
+  // Handles handleStatusChange.
   const handleStatusChange = async (milestoneId, nextStatus) => {
     if (!isOwner) {
       setError("Only the project owner can update milestones.");
@@ -95,6 +102,7 @@ const MilestoneSection = ({ projectId, project, milestones, user }) => {
     }
   };
 
+  // Handles handleDelete.
   const handleDelete = async (milestoneId) => {
     if (!isOwner) {
       setError("Only the project owner can delete milestones.");
@@ -123,6 +131,7 @@ const MilestoneSection = ({ projectId, project, milestones, user }) => {
     }
   };
 
+  // Handles statusBadgeClass.
   const statusBadgeClass = (status) => {
     if (status === "done") return "milestone-status-badge done";
     if (status === "in-progress") return "milestone-status-badge progress";
@@ -210,3 +219,4 @@ const MilestoneSection = ({ projectId, project, milestones, user }) => {
 };
 
 export default MilestoneSection;
+

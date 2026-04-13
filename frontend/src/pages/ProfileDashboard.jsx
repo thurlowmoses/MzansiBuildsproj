@@ -1,10 +1,19 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
+import DashboardActivitySection from "../components/dashboard/DashboardActivitySection";
+import DashboardFollowersSection from "../components/dashboard/DashboardFollowersSection";
+import DashboardProjectsSection from "../components/dashboard/DashboardProjectsSection";
+import DashboardStageBreakdown from "../components/dashboard/DashboardStageBreakdown";
+import DashboardStatsGrid from "../components/dashboard/DashboardStatsGrid";
 import { useAuth } from "../hooks/useAuth";
 import { db } from "../firebase_config";
 import "../styles/dashboard.css";
 
+// Handles formatTimeLabel.
 function formatTimeLabel(timestamp) {
   const seconds = timestamp?.seconds;
   if (!seconds) return "now";
@@ -24,6 +33,7 @@ function formatTimeLabel(timestamp) {
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+// Handles ProfileDashboard.
 function ProfileDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -106,6 +116,7 @@ function ProfileDashboard() {
       if (followerIds.length > 0) {
         const usersQuery = query(collection(db, "users"));
         const unsubUsers = onSnapshot(usersQuery, (usersSnapshot) => {
+          // Handles userMap.
           const userMap = {};
           usersSnapshot.docs.forEach((docItem) => {
             const data = docItem.data();
@@ -175,7 +186,9 @@ function ProfileDashboard() {
     [userProjects]
   );
 
+  // Handles getStageColor.
   const getStageColor = (stage) => {
+    // Handles colors.
     const colors = {
       idea: "#9b59b6",
       building: "#3498db",
@@ -200,142 +213,33 @@ function ProfileDashboard() {
       <div className="dashboard-container">
         <h1 className="dashboard-title">Dashboard</h1>
 
-        {/* Stats Grid */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-value">{projectStats.total}</div>
-            <div className="stat-label">Total Projects</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{activeProjectCount}</div>
-            <div className="stat-label">Active Projects</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{projectStats.completed}</div>
-            <div className="stat-label">Completed</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{followersCount}</div>
-            <div className="stat-label">Followers</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-value">{followingCount}</div>
-            <div className="stat-label">Following</div>
-          </div>
-        </div>
+        <DashboardStatsGrid
+          projectStats={projectStats}
+          activeProjectCount={activeProjectCount}
+          followersCount={followersCount}
+          followingCount={followingCount}
+        />
 
         <div className="dashboard-content">
-          {/* Active Projects Section */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Active Projects</h2>
-            {userProjects.length === 0 ? (
-              <div className="empty-state">
-                <p>No projects yet. Create your first project to get started!</p>
-                <button className="btn-primary" onClick={() => navigate("/projects/new")}>
-                  Create Project
-                </button>
-              </div>
-            ) : (
-              <div className="project-list">
-                {userProjects.map((project) => (
-                  <div key={project.id} className="project-list-item" onClick={() => navigate(`/projects/${project.id}`)}>
-                    <div className="project-list-header">
-                      <h3 className="project-title">{project.title || "Untitled Project"}</h3>
-                      <span className="project-stage" style={{ backgroundColor: getStageColor(project.stage) }}>
-                        {project.stage?.charAt(0).toUpperCase() + project.stage?.slice(1)}
-                      </span>
-                    </div>
-                    <p className="project-description">{project.description || "No description"}</p>
-                    <div className="project-meta">
-                      <span className="meta-item">👁 {project.views || 0} views</span>
-                      {project.milestones && <span className="meta-item">🎯 {project.milestones.length} milestones</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <DashboardProjectsSection
+            userProjects={userProjects}
+            getStageColor={getStageColor}
+            onOpenProject={(projectId) => navigate(`/projects/${projectId}`)}
+            onCreateProject={() => navigate("/projects/new")}
+          />
 
-          {/* Stage Breakdown Section */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Projects by Stage</h2>
-            <div className="stage-bars">
-              {[
-                { stage: "Idea", count: projectStats.idea, color: "#9b59b6" },
-                { stage: "Building", count: projectStats.building, color: "#3498db" },
-                { stage: "Beta", count: projectStats.beta, color: "#f39c12" },
-                { stage: "Completed", count: projectStats.completed, color: "#27ae60" },
-              ].map(({ stage, count, color }) => (
-                <div key={stage} className="stage-bar-container">
-                  <div className="stage-label">{stage}</div>
-                  <div className="stage-bar">
-                    <div
-                      className="stage-bar-fill"
-                      style={{
-                        width: `${projectStats.total > 0 ? (count / projectStats.total) * 100 : 0}%`,
-                        backgroundColor: color,
-                      }}
-                    />
-                  </div>
-                  <div className="stage-count">{count}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <DashboardStageBreakdown projectStats={projectStats} />
 
-          {/* Recent Activity Section */}
-          <section className="dashboard-section">
-            <h2 className="section-title">Recent Activity</h2>
-            {recentActivity.length === 0 ? (
-              <div className="empty-state">
-                <p>No activity yet. Check back when you get collaborator interactions!</p>
-              </div>
-            ) : (
-              <div className="activity-list">
-                {recentActivity.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className={`activity-item ${activity.isRead ? "read" : "unread"}`}
-                    onClick={() => navigate(`/projects/${activity.projectId}`)}
-                  >
-                    <div className="activity-dot" />
-                    <div className="activity-content">
-                      <p className="activity-message">
-                        <strong>{activity.actorName || "Developer"}</strong> {activity.message}
-                      </p>
-                      <span className="activity-time">{formatTimeLabel(activity.createdAt)}</span>
-                    </div>
-                    <span className="activity-type">{activity.type}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <DashboardActivitySection
+            recentActivity={recentActivity}
+            onOpenActivity={(projectId) => navigate(`/projects/${projectId}`)}
+            formatTimeLabel={formatTimeLabel}
+          />
 
-          {/* Top Followers Section */}
-          {followers.length > 0 && (
-            <section className="dashboard-section">
-              <h2 className="section-title">Recent Followers</h2>
-              <div className="followers-grid">
-                {followers.map((follower) => (
-                  <div
-                    key={follower.uid}
-                    className="follower-card"
-                    onClick={() => navigate(`/profile/${follower.uid}`)}
-                  >
-                    <div className="follower-avatar">
-                      {follower.photoURL ? (
-                        <img src={follower.photoURL} alt={follower.displayName} />
-                      ) : (
-                        <div className="avatar-placeholder">{follower.displayName?.charAt(0) || "?"}</div>
-                      )}
-                    </div>
-                    <p className="follower-name">{follower.displayName}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+          <DashboardFollowersSection
+            followers={followers}
+            onOpenProfile={(uid) => navigate(`/profile/${uid}`)}
+          />
         </div>
       </div>
     </main>

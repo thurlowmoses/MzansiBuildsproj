@@ -1,9 +1,13 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useAuth } from "../hooks/useAuth";
 import { auth } from "../firebase_config";
 
+// Handles SettingsDropdown.
 function SettingsDropdown({ onClose, user }) {
   const { logout } = useAuth();
   const [statusMessage, setStatusMessage] = useState("");
@@ -11,6 +15,7 @@ function SettingsDropdown({ onClose, user }) {
   const rootRef = useRef(null);
 
   useEffect(() => {
+    // Handles handleClickOutside.
     const handleClickOutside = (event) => {
       if (rootRef.current && !rootRef.current.contains(event.target)) {
         onClose();
@@ -21,6 +26,7 @@ function SettingsDropdown({ onClose, user }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  // Handles onSendReset.
   const onSendReset = async () => {
     try {
       setErrorMessage("");
@@ -37,6 +43,7 @@ function SettingsDropdown({ onClose, user }) {
     }
   };
 
+  // Handles onLogout.
   const onLogout = async () => {
     await logout();
     onClose();
@@ -51,6 +58,30 @@ function SettingsDropdown({ onClose, user }) {
 
       <NavLink className="settings-item" to="/profile" onClick={onClose}>
         Edit profile
+      </NavLink>
+
+      <NavLink className="settings-item" to="/projects/new" onClick={onClose}>
+        New project
+      </NavLink>
+
+      <NavLink className="settings-item" to="/messages" onClick={onClose}>
+        Messages
+      </NavLink>
+
+      <NavLink className="settings-item" to="/notifications" onClick={onClose}>
+        Notifications
+      </NavLink>
+
+      <NavLink className="settings-item" to="/discovery" onClick={onClose}>
+        Discovery
+      </NavLink>
+
+      <NavLink className="settings-item" to="/dashboard" onClick={onClose}>
+        Dashboard
+      </NavLink>
+
+      <NavLink className="settings-item" to="/celebration" onClick={onClose}>
+        Celebration wall
       </NavLink>
 
       <NavLink className="settings-item" to="/help" onClick={onClose}>
@@ -72,3 +103,4 @@ function SettingsDropdown({ onClose, user }) {
 }
 
 export default SettingsDropdown;
+

@@ -1,16 +1,22 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .error-boundary-layout {
   padding: 1.5rem;
   font-family: sans-serif;
 }
 
+/* Styles for .error-boundary-title. */
 .error-boundary-title {
   margin-bottom: 0.75rem;
 }
 
+/* Styles for .error-boundary-message. */
 .error-boundary-message {
   margin-bottom: 0.5rem;
 }
 
+/* Styles for .error-boundary-details. */
 .error-boundary-details {
   background: #111;
   color: #f8fafc;

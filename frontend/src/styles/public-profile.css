@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .public-profile-page {
   min-height: 100vh;
   padding: 24px 16px 40px;
@@ -5,18 +8,21 @@
   color: #f8fafc;
 }
 
+/* Styles for .public-profile-shell. */
 .public-profile-shell {
   max-width: 920px;
   margin: 0 auto;
 }
 
+/* Styles for .public-profile-error. */
 .public-profile-error {
   color: #ef4444;
 }
 
+/* Styles for .public-profile-header. */
 .public-profile-header {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 18px;
   align-items: center;
   padding: 18px;
@@ -26,6 +32,7 @@
   margin-bottom: 18px;
 }
 
+/* Styles for .public-profile-avatar. */
 .public-profile-avatar {
   width: 92px;
   height: 92px;
@@ -39,16 +46,19 @@
   font-size: 1.8rem;
 }
 
+/* Styles for .public-profile-copy h1. */
 .public-profile-copy h1 {
   margin: 0;
   font-size: 1.85rem;
 }
 
+/* Styles for .public-profile-copy p. */
 .public-profile-copy p {
   margin: 8px 0 0;
   color: #aac0d7;
 }
 
+/* Styles for .public-profile-tags. */
 .public-profile-tags {
   display: flex;
   flex-wrap: wrap;
@@ -56,6 +66,7 @@
   margin-top: 12px;
 }
 
+/* Styles for .public-profile-tags span. */
 .public-profile-tags span {
   border: 1px solid rgba(16, 185, 129, 0.35);
   border-radius: 999px;
@@ -65,10 +76,12 @@
   font-size: 0.82rem;
 }
 
+/* Styles for .public-profile-actions. */
 .public-profile-actions {
   margin-top: 10px;
 }
 
+/* Styles for .public-profile-message-btn. */
 .public-profile-message-btn {
   border: 1px solid rgba(16, 185, 129, 0.7);
   background: rgba(16, 185, 129, 0.15);
@@ -79,14 +92,17 @@
   font-weight: 700;
 }
 
+/* Styles for .public-profile-message-btn:hover. */
 .public-profile-message-btn:hover {
   background: rgba(16, 185, 129, 0.24);
 }
 
+/* Styles for .public-profile-section. */
 .public-profile-section {
   margin-top: 18px;
 }
 
+/* Styles for .public-profile-section-head. */
 .public-profile-section-head {
   display: flex;
   justify-content: space-between;
@@ -95,25 +111,30 @@
   margin-bottom: 12px;
 }
 
+/* Styles for .public-profile-section-head h2. */
 .public-profile-section-head h2 {
   margin: 0;
   font-size: 1.1rem;
 }
 
+/* Styles for .public-profile-section-head span. */
 .public-profile-section-head span {
   color: #d1d5db;
   font-size: 0.88rem;
 }
 
+/* Styles for .public-profile-empty. */
 .public-profile-empty {
   color: #d1d5db;
 }
 
+/* Styles for .public-profile-struggles. */
 .public-profile-struggles {
   display: grid;
   gap: 10px;
 }
 
+/* Styles for .public-profile-struggle-card. */
 .public-profile-struggle-card {
   border-radius: 14px;
   border: 1px solid rgba(255, 208, 137, 0.35);
@@ -122,12 +143,73 @@
   padding: 12px 14px;
 }
 
+.public-profile-follow-btn,
+/* Styles for .public-profile-unfollow-btn. */
+.public-profile-unfollow-btn {
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Styles for .public-profile-follow-btn. */
+.public-profile-follow-btn {
+  border: 1px solid rgba(16, 185, 129, 0.7);
+  background: rgba(16, 185, 129, 0.18);
+  color: #bbf7d0;
+}
+
+/* Styles for .public-profile-unfollow-btn. */
+.public-profile-unfollow-btn {
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.08);
+  color: #fecaca;
+}
+
+.public-profile-follow-btn:disabled,
+/* Styles for .public-profile-unfollow-btn:disabled. */
+.public-profile-unfollow-btn:disabled {
+  opacity: 0.6;
+}
+
+/* Styles for .public-profile-avatar-fallback. */
+.public-profile-avatar-fallback {
+  display: grid;
+  place-items: center;
+}
+
+/* Styles for .public-profile-avatar-img. */
+.public-profile-avatar-img {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(16, 185, 129, 0.55);
+}
+
+/* Styles for .public-profile-shell .feed-list. */
+.public-profile-shell .feed-list {
+  margin-top: 0;
+}
+
+/* Styles for .public-profile-project-btn. */
+.public-profile-project-btn {
+  margin-top: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.12);
+  color: #bbf7d0;
+}
+
+/* Styles for @media (max-width: 720px). */
 @media (max-width: 720px) {
+/* Styles for .public-profile-header. */
   .public-profile-header {
     grid-template-columns: 1fr;
     justify-items: start;
   }
 
+/* Styles for .public-profile-section-head. */
   .public-profile-section-head {
     flex-direction: column;
     align-items: flex-start;

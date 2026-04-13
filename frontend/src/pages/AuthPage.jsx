@@ -1,98 +1,18 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
+import AuthForm from "../components/auth/AuthForm";
+import AuthMessages from "../components/auth/AuthMessages";
 import { auth } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
+import { getPasswordReuseStatus, getPasswordStatus } from "../utils/passwordUtils";
 import "../styles/auth.css";
 
-const PASSWORD_RULES = [
-	{
-		id: "length",
-		label: "At least 12 characters",
-		test: (password) => password.length >= 12,
-	},
-	{
-		id: "upper",
-		label: "At least one uppercase letter",
-		test: (password) => /[A-Z]/.test(password),
-	},
-	{
-		id: "lower",
-		label: "At least one lowercase letter",
-		test: (password) => /[a-z]/.test(password),
-	},
-	{
-		id: "digit",
-		label: "At least one number",
-		test: (password) => /\d/.test(password),
-	},
-	{
-		id: "special",
-		label: "At least one special character",
-		test: (password) => /[!@#$%^&*()[\]{}\-_=+|;:'",.<>/?`~]/.test(password),
-	},
-];
-
-function getPasswordStatus(password) {
-	const checks = PASSWORD_RULES.map((rule) => ({
-		...rule,
-		passed: rule.test(password),
-	}));
-	const passedCount = checks.filter((item) => item.passed).length;
-	const score = Math.round((passedCount / checks.length) * 100);
-
-	let label = "Weak";
-	if (score >= 80) {
-		label = "Strong";
-	} else if (score >= 60) {
-		label = "Good";
-	} else if (score >= 40) {
-		label = "Fair";
-	}
-
-	return {
-		checks,
-		score,
-		label,
-		isValid: checks.every((item) => item.passed),
-	};
-}
-
-function normalizeComparisonValue(value) {
-	return String(value || "")
-		.trim()
-		.toLowerCase()
-		.replace(/[^a-z0-9]/g, "");
-}
-
-function getPasswordReuseStatus(password, email, displayName) {
-	const normalizedPassword = normalizeComparisonValue(password);
-	const emailLocalPart = normalizeComparisonValue(String(email || "").split("@")[0]);
-	const displayNameValue = normalizeComparisonValue(displayName);
-
-	const checks = [
-		{
-			id: "email-local-part",
-			label: "Password is different from the email name part",
-			passed: !emailLocalPart || normalizedPassword !== emailLocalPart,
-		},
-		{
-			id: "display-name",
-			label: "Password is different from your display name",
-			passed:
-				!displayNameValue ||
-				!normalizedPassword ||
-				!normalizedPassword.includes(displayNameValue) && !displayNameValue.includes(normalizedPassword),
-		},
-	];
-
-	return {
-		checks,
-		isValid: checks.every((item) => item.passed),
-	};
-}
-
+// Handles AuthPage.
 function AuthPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -143,11 +63,13 @@ function AuthPage() {
 		passwordReuseStatus.isValid &&
 		confirmPasswordMatches;
 
+	// Handles clearMessages.
 	const clearMessages = () => {
 		setErrorMessage("");
 		setSuccessMessage("");
 	};
 
+	// Handles handleAuthError.
 	const handleAuthError = (error) => {
 		setErrorMessage(error.message || "Something went wrong. Please try again.");
 		if (error.message?.includes("verified") || error.message?.includes("verify")) {
@@ -155,6 +77,7 @@ function AuthPage() {
 		}
 	};
 
+	// Handles validateRegisterForm.
 	const validateRegisterForm = () => {
 		if (!confirmPasswordMatches) {
 			return "Passwords do not match.";
@@ -173,6 +96,7 @@ function AuthPage() {
 		return "";
 	};
 
+	// Handles handleRegisterSubmit.
 	const handleRegisterSubmit = async () => {
 		const validationError = validateRegisterForm();
 		if (validationError) {
@@ -201,6 +125,7 @@ function AuthPage() {
 		});
 	};
 
+	// Handles handleLoginSubmit.
 	const handleLoginSubmit = async () => {
 		const user = await login({
 			email: formData.email,
@@ -219,6 +144,7 @@ function AuthPage() {
 		setTimeout(() => navigate("/feed"), 800);
 	};
 
+	// Handles onChange.
 	const onChange = (event) => {
 		const { name, value } = event.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
@@ -227,6 +153,7 @@ function AuthPage() {
 		}
 	};
 
+	// Handles onSubmit.
 	const onSubmit = async (event) => {
 		event.preventDefault();
 		setLoading(true);
@@ -246,6 +173,7 @@ function AuthPage() {
 		}
 	};
 
+	// Handles resendVerification.
 	const resendVerification = async () => {
 		try {
 			clearMessages();
@@ -265,6 +193,7 @@ function AuthPage() {
 		}
 	};
 
+	// Handles onForgotPassword.
 	const onForgotPassword = async () => {
 		// Trigger Firebase reset email from the login form.
 		try {
@@ -286,121 +215,25 @@ function AuthPage() {
 			<section className="auth-container">
 				<h1 className="auth-title">{mode === "login" ? "Login" : "Create Account"}</h1>
 
-				<form className="auth-form" onSubmit={onSubmit}>
-					{mode === "register" && (
-						<div className="form-group">
-							<label htmlFor="displayName">Full Name</label>
-							<input
-								id="displayName"
-								name="displayName"
-								type="text"
-								value={formData.displayName}
-								onChange={onChange}
-								required
-							/>
-						</div>
-					)}
+				<AuthForm
+					mode={mode}
+					formData={formData}
+					onChange={onChange}
+					onSubmit={onSubmit}
+					loading={loading}
+					isRegisterFormValid={isRegisterFormValid}
+					onForgotPassword={onForgotPassword}
+					passwordStatus={passwordStatus}
+					passwordReuseStatus={passwordReuseStatus}
+					confirmPasswordMatches={confirmPasswordMatches}
+				/>
 
-					<div className="form-group">
-						<label htmlFor="email">Email</label>
-						<input
-							id="email"
-							name="email"
-							type="email"
-							value={formData.email}
-							onChange={onChange}
-							required
-						/>
-					</div>
-
-					<div className="form-group">
-						<label htmlFor="password">Password</label>
-						<input
-							id="password"
-							name="password"
-							type="password"
-							value={formData.password}
-							onChange={onChange}
-							required
-							minLength={12}
-						/>
-						{mode === "register" && (
-							<>
-								<p className="password-hint">
-									Password strength: {passwordStatus.label} ({passwordStatus.score}%)
-								</p>
-								<ul className="password-checklist">
-									{passwordStatus.checks.map((item) => (
-										<li key={item.id} className={item.passed ? "passed" : "pending"}>
-											{item.label}
-										</li>
-									))}
-									{passwordReuseStatus.checks.map((item) => (
-										<li key={item.id} className={item.passed ? "passed" : "pending"}>
-											{item.label}
-										</li>
-									))}
-								</ul>
-							</>
-						)}
-					</div>
-
-					{mode === "register" && (
-						<div className="form-group">
-							<label htmlFor="confirmPassword">Confirm Password</label>
-							<input
-								id="confirmPassword"
-								name="confirmPassword"
-								type="password"
-								value={formData.confirmPassword}
-								onChange={onChange}
-								required
-								minLength={12}
-							/>
-							{formData.confirmPassword ? (
-								<p className={confirmPasswordMatches ? "password-match pass" : "password-match fail"}>
-									{confirmPasswordMatches ? "Passwords match." : "Passwords do not match yet."}
-								</p>
-							) : null}
-						</div>
-					)}
-
-					{mode === "login" && (
-						<button type="button" className="forgot-password-btn" onClick={onForgotPassword}>
-							Forgot password?
-						</button>
-					)}
-
-					{/* Submit action changes by mode. */}
-					<button
-						className="auth-button"
-						type="submit"
-						disabled={loading || (mode === "register" && !isRegisterFormValid)}
-					>
-						{loading ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
-					</button>
-				</form>
-
-				{errorMessage && <p className="error-message">{errorMessage}</p>}
-				{showResend && (
-					<p style={{ fontSize: "13px", color: "#888", marginTop: "8px" }}>
-						Did not receive the email?{" "}
-						<button
-							type="button"
-							onClick={resendVerification}
-							style={{
-								background: "none",
-								border: "none",
-								color: "#4caf50",
-								cursor: "pointer",
-								textDecoration: "underline",
-							}}
-						>
-							Resend verification email
-						</button>
-					</p>
-				)}
-				{successMessage && <p className="success-message">{successMessage}</p>}
+				<AuthMessages
+					errorMessage={errorMessage}
+					successMessage={successMessage}
+					showResend={showResend}
+					onResendVerification={resendVerification}
+				/>
 
 				<p className="auth-toggle">
 					{mode === "login" ? "No account yet?" : "Already registered?"}{" "}
@@ -422,3 +255,4 @@ function AuthPage() {
 }
 
 export default AuthPage;
+

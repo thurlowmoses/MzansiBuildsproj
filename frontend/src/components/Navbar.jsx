@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -6,6 +9,7 @@ import { db } from "../firebase_config";
 import SettingsDropdown from "./SettingsDropdown";
 import "../styles/navbar.css";
 
+// Handles IconHome.
 function IconHome() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -14,6 +18,7 @@ function IconHome() {
   );
 }
 
+// Handles IconPlus.
 function IconPlus() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -22,6 +27,7 @@ function IconPlus() {
   );
 }
 
+// Handles IconMessage.
 function IconMessage() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -30,6 +36,7 @@ function IconMessage() {
   );
 }
 
+// Handles IconSpark.
 function IconSpark() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -38,6 +45,7 @@ function IconSpark() {
   );
 }
 
+// Handles IconUser.
 function IconUser() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -46,6 +54,7 @@ function IconUser() {
   );
 }
 
+// Handles IconSettings.
 function IconSettings() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -54,6 +63,7 @@ function IconSettings() {
   );
 }
 
+// Handles IconBell.
 function IconBell() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -62,14 +72,16 @@ function IconBell() {
   );
 }
 
+// Handles IconTool.
 function IconTool() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M21 7.2a6.2 6.2 0 0 1-8.8 5.6l-6.8 6.8a1.2 1.2 0 0 1-1.7 0l-.3-.3a1.2 1.2 0 0 1 0-1.7l6.8-6.8A6.2 6.2 0 0 1 16.8 3a1 1 0 0 1 .7 1.7l-2 2 1.8 1.8 2-2a1 1 0 0 1 1.7.7Z" />
+      <path d="M6 10.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm6 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm6 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
     </svg>
   );
 }
 
+// Handles IconHelp.
 function IconHelp() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -78,6 +90,7 @@ function IconHelp() {
   );
 }
 
+// Handles IconCompass.
 function IconCompass() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -86,6 +99,7 @@ function IconCompass() {
   );
 }
 
+// Handles IconDashboard.
 function IconDashboard() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -94,6 +108,7 @@ function IconDashboard() {
   );
 }
 
+// Handles IconTrophy.
 function IconTrophy() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -102,6 +117,7 @@ function IconTrophy() {
   );
 }
 
+// Handles getTimeValue.
 function getTimeValue(value) {
   if (!value) return 0;
   if (typeof value === "object" && typeof value.seconds === "number") {
@@ -111,6 +127,7 @@ function getTimeValue(value) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+// Handles Navbar.
 function Navbar() {
   const { user } = useAuth();
   const location = useLocation();
@@ -119,6 +136,7 @@ function Navbar() {
   const [followingIds, setFollowingIds] = useState([]);
   const [activePeople, setActivePeople] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [allUsers, setAllUsers] = useState([]);
   const [allProjects, setAllProjects] = useState([]);
@@ -132,6 +150,7 @@ function Navbar() {
       setFollowingIds([]);
       setActivePeople([]);
       setUnreadNotifications(0);
+      setUnreadMessages(0);
       return;
     }
 
@@ -177,6 +196,7 @@ function Navbar() {
   useEffect(() => {
     if (!user) {
       setUnreadNotifications(0);
+      setUnreadMessages(0);
       knownNotificationIdsRef.current = new Set();
       hasInitializedNotificationsRef.current = false;
       return;
@@ -186,7 +206,7 @@ function Navbar() {
 
     const unsubscribe = onSnapshot(notificationsQuery, (snapshot) => {
       const userRows = snapshot.docs.map((docItem) => ({ id: docItem.id, ...(docItem.data() || {}) }));
-      const unread = userRows.filter((row) => !row.isRead).length;
+      const unreadRows = userRows.filter((row) => !row.isRead);
 
       const nextKnown = new Set(userRows.map((row) => row.id));
       const newlyArrived = userRows
@@ -211,8 +231,16 @@ function Navbar() {
       knownNotificationIdsRef.current = nextKnown;
       hasInitializedNotificationsRef.current = true;
 
-      const unreadFromFilter = userRows.filter((row) => !row.isRead).length;
-      setUnreadNotifications(unreadFromFilter);
+      setUnreadNotifications(unreadRows.length);
+
+      const unreadMessageRows = unreadRows.filter(
+        (row) =>
+          row.type === "message" &&
+          row.targetType === "messages" &&
+          row.actorId &&
+          row.actorId !== user.uid
+      );
+      setUnreadMessages(unreadMessageRows.length);
     });
 
     return unsubscribe;
@@ -244,7 +272,6 @@ function Navbar() {
     return unsubscribe;
   }, []);
 
-  const messageCount = useMemo(() => Math.min(activePeople.length, 9), [activePeople.length]);
   const normalizedQuery = useMemo(() => searchQuery.trim().toLowerCase(), [searchQuery]);
 
   const matchedUsers = useMemo(() => {
@@ -294,6 +321,7 @@ function Navbar() {
 
   const showSearchResults = searchOpen && (normalizedQuery.length > 0 || trendingProjects.length > 0);
 
+  // Handles openProject.
   const openProject = (project) => {
     if (project.isGitHub && project.githubUrl) {
       window.open(project.githubUrl, "_blank", "noopener,noreferrer");
@@ -304,6 +332,7 @@ function Navbar() {
     setSearchQuery("");
   };
 
+  // Handles openUser.
   const openUser = (person) => {
     if (person.id === user?.uid) {
       navigate("/profile");
@@ -515,7 +544,7 @@ function Navbar() {
           <NavLink to="/messages" className="nav-icon nav-messages" title="Messages">
             <IconMessage />
             <span className="sr-only">Messages</span>
-            {messageCount > 0 ? <span className="message-badge">{messageCount}</span> : null}
+            {unreadMessages > 0 ? <span className="message-badge">{unreadMessages}</span> : null}
           </NavLink>
           <NavLink to="/notifications" className="nav-icon nav-notifications" title="Notifications">
             <IconBell />
@@ -541,10 +570,10 @@ function Navbar() {
               type="button"
               className="nav-icon settings-btn"
               onClick={() => setShowSettings(!showSettings)}
-              title="Tools"
+              title="More"
             >
               <IconTool />
-              <span className="sr-only">Tools</span>
+              <span className="sr-only">More tools</span>
             </button>
             {showSettings && (
               <SettingsDropdown onClose={() => setShowSettings(false)} user={user} />
@@ -583,3 +612,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

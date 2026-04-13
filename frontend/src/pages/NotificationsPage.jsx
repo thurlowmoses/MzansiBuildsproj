@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
@@ -5,6 +8,7 @@ import { db } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/notifications.css";
 
+// Handles formatTimeLabel.
 function formatTimeLabel(timestamp) {
   const seconds = timestamp?.seconds;
   if (!seconds) return "now";
@@ -18,6 +22,7 @@ function formatTimeLabel(timestamp) {
   });
 }
 
+// Handles labelForNotification.
 function labelForNotification(notification) {
   switch (notification.type) {
     case "follow_request":
@@ -41,6 +46,7 @@ function labelForNotification(notification) {
   }
 }
 
+// Handles NotificationsPage.
 function NotificationsPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -100,6 +106,7 @@ function NotificationsPage() {
     setVisibleCount(6);
   }, [activeFilter, notifications.length]);
 
+  // Handles markRead.
   const markRead = async (notificationId) => {
     await updateDoc(doc(db, "notifications", notificationId), {
       isRead: true,
@@ -107,6 +114,7 @@ function NotificationsPage() {
     });
   };
 
+  // Handles openNotification.
   const openNotification = async (notification) => {
     if (!notification.isRead) {
       await markRead(notification.id);
@@ -127,6 +135,7 @@ function NotificationsPage() {
     }
   };
 
+  // Handles openMessageFromNotification.
   const openMessageFromNotification = (event, notification) => {
     event.stopPropagation();
     const actorId = notification.actorId;

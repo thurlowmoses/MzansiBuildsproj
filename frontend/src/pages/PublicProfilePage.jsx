@@ -1,187 +1,247 @@
-import { useEffect, useMemo, useState } from "react";
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
+import PublicProfileHeader from "../components/public-profile/PublicProfileHeader";
+import PublicProfileProjects from "../components/public-profile/PublicProfileProjects";
 import { db } from "../firebase_config";
-import "../styles/feed.css";
+import { useAuth } from "../hooks/useAuth";
+import "../styles/profile.css";
 import "../styles/public-profile.css";
 
-function getTimeValue(value) {
-  if (!value) return 0;
-  if (typeof value === "object" && typeof value.seconds === "number") {
-    return value.seconds * 1000;
-  }
-  const parsed = new Date(value).getTime();
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function PublicProfilePage() {
-  const { userId } = useParams();
+// Handles PublicProfilePage.
+const PublicProfilePage = () => {
+  const { uid } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [profile, setProfile] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followDocId, setFollowDocId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [followLoading, setFollowLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!userId) {
-      setErrorMessage("Profile not found.");
-      setLoading(false);
-      return;
+    if (user?.uid && uid === user.uid) {
+      navigate("/profile", { replace: true });
     }
+  }, [uid, user, navigate]);
 
-    const unsubscribe = onSnapshot(
-      doc(db, "users", userId),
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setProfile(null);
-          setErrorMessage("Profile not found.");
+  useEffect(() => {
+    if (!uid) return;
+
+    // Handles loadProfile.
+    const loadProfile = async () => {
+      try {
+        const snapshot = await getDoc(doc(db, "users", uid));
+        if (snapshot.exists()) {
+          setProfile(snapshot.data());
         } else {
-          setProfile({ id: snapshot.id, ...(snapshot.data() || {}) });
-          setErrorMessage("");
+          setError("Profile not found.");
         }
-
-        setLoading(false);
-      },
-      (error) => {
-        setErrorMessage(error?.message || "Could not load profile.");
+      } catch {
+        setError("Could not load profile.");
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return unsubscribe;
-  }, [userId]);
+    loadProfile();
+  }, [uid]);
 
   useEffect(() => {
-    if (!userId) {
-      setProjects([]);
+    if (!uid) return;
+
+    const projectsQuery = query(
+      collection(db, "projects"),
+      where("userId", "==", uid),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(projectsQuery, (snapshot) => {
+      setProjects(snapshot.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() })));
+    });
+
+    return () => unsubscribe();
+  }, [uid]);
+
+  useEffect(() => {
+    if (!uid) return;
+
+    const followersQ = query(collection(db, "follows"), where("followingId", "==", uid));
+    const followingQ = query(collection(db, "follows"), where("followerId", "==", uid));
+
+    const unsubFollowers = onSnapshot(followersQ, (snapshot) => setFollowerCount(snapshot.size));
+    const unsubFollowing = onSnapshot(followingQ, (snapshot) => setFollowingCount(snapshot.size));
+
+    return () => {
+      unsubFollowers();
+      unsubFollowing();
+    };
+  }, [uid]);
+
+  useEffect(() => {
+    if (!uid || !user?.uid) return;
+
+    const followsQuery = query(
+      collection(db, "follows"),
+      where("followerId", "==", user.uid),
+      where("followingId", "==", uid)
+    );
+
+    const unsubscribe = onSnapshot(followsQuery, (snapshot) => {
+      if (!snapshot.empty) {
+        setIsFollowing(true);
+        setFollowDocId(snapshot.docs[0].id);
+      } else {
+        setIsFollowing(false);
+        setFollowDocId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [uid, user?.uid]);
+
+  // Handles handleFollow.
+  const handleFollow = async () => {
+    if (!user) {
+      navigate("/auth");
       return;
     }
 
-    const unsubscribe = onSnapshot(collection(db, "projects"), (snapshot) => {
-      const items = snapshot.docs
-        .map((docItem) => ({ id: docItem.id, ...(docItem.data() || {}) }))
-        .filter((project) => project.userId === userId && !project.isGitHub);
+    setFollowLoading(true);
+    try {
+      await addDoc(collection(db, "follows"), {
+        followerId: user.uid,
+        followingId: uid,
+        createdAt: serverTimestamp(),
+      });
 
-      items.sort((a, b) => getTimeValue(b.updatedAt || b.createdAt) - getTimeValue(a.updatedAt || a.createdAt));
-      setProjects(items);
-    });
+      await addDoc(collection(db, "notifications"), {
+        type: "follow",
+        recipientId: uid,
+        actorId: user.uid,
+        actorName: user.displayName || "A developer",
+        actorPhoto: user.photoURL || "",
+        message: `${user.displayName || "A developer"} started following you.`,
+        isRead: false,
+        createdAt: serverTimestamp(),
+      });
+    } catch {
+      setError("Could not follow. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
-    return unsubscribe;
-  }, [userId]);
+  // Handles handleUnfollow.
+  const handleUnfollow = async () => {
+    if (!followDocId) return;
 
-  const struggles = useMemo(() => {
-    const values = projects.map((project) => project.supportNeeded).filter(Boolean);
-    return Array.from(new Set(values));
-  }, [projects]);
+    setFollowLoading(true);
+    try {
+      await deleteDoc(doc(db, "follows", followDocId));
+    } catch {
+      setError("Could not unfollow.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  // Handles stageColor.
+  const stageColor = (stage) => {
+    // Handles map.
+    const map = {
+      idea: "#7b8cde",
+      building: "#4caf50",
+      beta: "#ffc107",
+      completed: "#81c784",
+    };
+    return map[stage] || "#888";
+  };
 
   if (loading) {
     return (
-      <main className="public-profile-page">
-        <div className="public-profile-shell">
-          <p>Loading profile...</p>
+      <div className="profile-page">
+        <div className="profile-page-inner">
+          <p className="profile-loading">Loading profile...</p>
         </div>
-      </main>
+      </div>
     );
   }
 
-  return (
-    <main className="public-profile-page">
-      <div className="public-profile-shell">
-        {errorMessage ? <p className="public-profile-error">{errorMessage}</p> : null}
-
-        {profile ? (
-          <>
-            <header className="public-profile-header">
-              {profile.photoURL ? (
-                <img src={profile.photoURL} alt={profile.displayName || "Developer"} className="public-profile-avatar" />
-              ) : (
-                <div className="public-profile-avatar public-profile-avatar-fallback">
-                  {(profile.displayName || profile.email || "Developer")[0].toUpperCase()}
-                </div>
-              )}
-
-              <div className="public-profile-copy">
-                <h1>{profile.displayName || profile.email || "Developer"}</h1>
-                <p>{profile.bio || "This developer has not shared a bio yet."}</p>
-                <div className="public-profile-tags">
-                  <span>{projects.length.toLocaleString()} projects</span>
-                  <span>{profile.isPrivate ? "Private account" : "Public account"}</span>
-                </div>
-                <div className="public-profile-actions">
-                  <button
-                    type="button"
-                    className="public-profile-message-btn"
-                    onClick={() => navigate(`/messages?userId=${userId}`)}
-                  >
-                    Message developer
-                  </button>
-                </div>
-              </div>
-            </header>
-
-            <section className="public-profile-section">
-              <div className="public-profile-section-head">
-                <h2>What they created</h2>
-                <span>Recent builds and progress</span>
-              </div>
-
-              {projects.length === 0 ? (
-                <p className="public-profile-empty">No public projects yet.</p>
-              ) : (
-                <div className="feed-list">
-                  {projects.map((project) => (
-                    <article key={project.id} className="project-card">
-                      <header className="card-header">
-                        <div className="avatar">
-                          {(project.userName || profile.displayName || "D")[0].toUpperCase()}
-                        </div>
-                        <div className="card-meta">
-                          <p className="card-username">{project.title}</p>
-                          <p className="card-time">{project.stage || "idea"}</p>
-                        </div>
-                        <span className="stage-badge stage-building">{project.completed ? "completed" : "in progress"}</span>
-                      </header>
-
-                      <div className="card-body">
-                        <p className="card-description">{project.description}</p>
-                        {project.supportNeeded ? (
-                          <div className="support-box">
-                            <span className="support-label">Needs help:</span> {project.supportNeeded}
-                          </div>
-                        ) : null}
-                        <button type="button" className="profile-project-btn" onClick={() => navigate(`/projects/${project.id}`)}>
-                          Open project
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="public-profile-section">
-              <div className="public-profile-section-head">
-                <h2>What they are struggling with</h2>
-                <span>Support requests from their builds</span>
-              </div>
-
-              {struggles.length === 0 ? (
-                <p className="public-profile-empty">No struggle notes have been shared yet.</p>
-              ) : (
-                <div className="public-profile-struggles">
-                  {struggles.map((item) => (
-                    <div key={item} className="public-profile-struggle-card">
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-          </>
-        ) : null}
+  if (error) {
+    return (
+      <div className="profile-page">
+        <div className="profile-page-inner">
+          <p className="profile-error">{error}</p>
+        </div>
       </div>
-    </main>
+    );
+  }
+
+  const displayName = profile?.name || profile?.displayName || "Developer";
+  const avatarUrl = profile?.avatarUrl || profile?.photoURL;
+
+  return (
+    <div className="profile-page public-profile-page">
+      <div className="profile-page-inner public-profile-shell">
+        {Array.isArray(profile?.skills) && profile.skills.length > 0 ? (
+          <div className="profile-skills-row public-profile-actions">
+            {profile.skills.map((skill) => (
+              <span key={skill} className="profile-skill-pill public-profile-message-btn">
+                {skill}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="profile-tabs public-profile-tabs">
+          <button type="button" className="profile-tab is-active">
+            Projects
+          </button>
+          <button type="button" className="profile-tab" onClick={() => navigate(`/profile/${uid}#followers`)}>
+            Followers
+          </button>
+          <button type="button" className="profile-tab" onClick={() => navigate(`/profile/${uid}#following`)}>
+            Following
+          </button>
+        </div>
+
+        <PublicProfileHeader
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          profile={profile}
+          projectsCount={projects.length}
+          followerCount={followerCount}
+          followingCount={followingCount}
+          user={user}
+          isFollowing={isFollowing}
+          followLoading={followLoading}
+          onFollowToggle={isFollowing ? handleUnfollow : handleFollow}
+        />
+        <PublicProfileProjects projects={projects} displayName={displayName} stageColor={stageColor} />
+      </div>
+    </div>
   );
-}
+};
 
 export default PublicProfilePage;
+

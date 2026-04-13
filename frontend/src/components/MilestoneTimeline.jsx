@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 function getTimeLabel(value) {
 	const seconds = value?.seconds;
 	if (!seconds) return "now";
@@ -5,6 +8,7 @@ function getTimeLabel(value) {
 	return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+// Handles MilestoneTimeline.
 function MilestoneTimeline({ milestones = [] }) {
 	if (!Array.isArray(milestones) || milestones.length === 0) {
 		return <p className="timeline-empty">No milestones yet.</p>;
@@ -35,3 +39,4 @@ function MilestoneTimeline({ milestones = [] }) {
 }
 
 export default MilestoneTimeline;
+

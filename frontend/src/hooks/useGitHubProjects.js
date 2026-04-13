@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 // hooks/useGitHubProjects.js
 //
 // WHY THIS EXISTS:
@@ -20,12 +23,14 @@
 
 import { useState, useEffect } from "react";
 
+// Handles useGitHubProjects.
 const useGitHubProjects = (query = "language:javascript stars:>50", count = 8) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Handles fetchSearch.
     const fetchSearch = async (searchText) => {
       const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(searchText)}&sort=updated&order=desc&per_page=${count}`;
 
@@ -62,6 +67,7 @@ const useGitHubProjects = (query = "language:javascript stars:>50", count = 8) =
       return transformed;
     };
 
+    // Handles fetchProjects.
     const fetchProjects = async () => {
       try {
         setLoading(true);
@@ -94,3 +100,4 @@ const useGitHubProjects = (query = "language:javascript stars:>50", count = 8) =
 };
 
 export default useGitHubProjects;
+

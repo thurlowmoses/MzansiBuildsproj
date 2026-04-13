@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .discovery-page {
   min-height: 100vh;
   color: #f8fafc;
@@ -5,26 +8,31 @@
   padding: 24px 16px 40px;
 }
 
+/* Styles for .discovery-container. */
 .discovery-container {
   max-width: 980px;
   margin: 0 auto;
 }
 
+/* Styles for .discovery-header. */
 .discovery-header {
   margin-bottom: 18px;
 }
 
+/* Styles for .discovery-header h1. */
 .discovery-header h1 {
   margin: 0;
   color: #f8fafc;
   font-size: 1.85rem;
 }
 
+/* Styles for .discovery-header p. */
 .discovery-header p {
   margin: 8px 0 0;
   color: #d1d5db;
 }
 
+/* Styles for .discovery-tabs. */
 .discovery-tabs {
   display: inline-flex;
   gap: 10px;
@@ -35,6 +43,7 @@
   margin-bottom: 16px;
 }
 
+/* Styles for .discovery-tab. */
 .discovery-tab {
   border: 0;
   border-radius: 999px;
@@ -44,19 +53,23 @@
   font-weight: 700;
 }
 
+/* Styles for .discovery-tab.active. */
 .discovery-tab.active {
   background: linear-gradient(140deg, #10b981, #059669);
   color: #041f17;
 }
 
+/* Styles for .discovery-section. */
 .discovery-section {
   margin-top: 18px;
 }
 
+/* Styles for .discovery-section-spaced. */
 .discovery-section-spaced {
   margin-top: 28px;
 }
 
+/* Styles for .load-more-btn. */
 .load-more-btn {
   margin-top: 14px;
   border: 1px solid rgba(16, 185, 129, 0.6);
@@ -67,10 +80,12 @@
   font-weight: 700;
 }
 
+/* Styles for .load-more-btn:hover. */
 .load-more-btn:hover {
   background: rgba(16, 185, 129, 0.2);
 }
 
+/* Styles for .discovery-section-head. */
 .discovery-section-head {
   display: flex;
   align-items: baseline;
@@ -79,27 +94,32 @@
   margin-bottom: 10px;
 }
 
+/* Styles for .discovery-section-head h2. */
 .discovery-section-head h2 {
   margin: 0;
   font-size: 1.1rem;
   color: #f8fafc;
 }
 
+/* Styles for .discovery-section-head span. */
 .discovery-section-head span {
   color: #d1d5db;
   font-size: 0.88rem;
 }
 
+/* Styles for .discovery-card. */
 .discovery-card {
   margin-bottom: 0;
 }
 
+/* Styles for .mzanzi-badge. */
 .mzanzi-badge {
   border-color: rgba(16, 185, 129, 0.55);
   color: #bbf7d0;
   background: rgba(16, 185, 129, 0.1);
 }
 
+/* Styles for .trend-pill. */
 .trend-pill {
   display: inline-flex;
   margin-top: 10px;
@@ -111,27 +131,33 @@
   font-size: 0.78rem;
 }
 
+/* Styles for @media (max-width: 720px). */
 @media (max-width: 720px) {
+/* Styles for .discovery-tabs. */
   .discovery-tabs {
     width: 100%;
     justify-content: space-between;
   }
 
+/* Styles for .discovery-tab. */
   .discovery-tab {
     flex: 1;
   }
 
+/* Styles for .discovery-section-head. */
   .discovery-section-head {
     flex-direction: column;
     align-items: flex-start;
   }
 }
 
+/* Styles for .discovery-note. */
 .discovery-note {
   margin: 0 0 12px;
   color: #d1d5db;
 }
 
+/* Styles for .discovery-error. */
 .discovery-error {
   margin: 0 0 12px;
   color: #ef4444;

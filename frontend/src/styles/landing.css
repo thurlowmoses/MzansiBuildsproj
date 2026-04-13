@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* landing.css */
 
 .landing-page {
@@ -6,6 +9,7 @@
   color: #fff;
 }
 
+/* Styles for .landing-nav. */
 .landing-nav {
   display: flex;
   align-items: center;
@@ -14,6 +18,7 @@
   border-bottom: 1px solid #1a1a1a;
 }
 
+/* Styles for .landing-logo. */
 .landing-logo {
   display: flex;
   align-items: center;
@@ -22,6 +27,7 @@
   font-weight: 700;
 }
 
+/* Styles for .logo-mark. */
 .logo-mark {
   width: 32px;
   height: 32px;
@@ -35,10 +41,12 @@
   font-family: monospace;
 }
 
+/* Styles for .logo-green. */
 .logo-green {
   color: #4caf50;
 }
 
+/* Styles for .landing-signin. */
 .landing-signin {
   background: transparent;
   border: 1px solid #333;
@@ -50,6 +58,7 @@
   transition: all 0.2s;
 }
 
+/* Styles for .landing-signin:hover. */
 .landing-signin:hover {
   border-color: #4caf50;
   color: #4caf50;
@@ -61,8 +70,10 @@
   margin: 0 auto;
   padding: 6rem 2rem 4rem;
   text-align: center;
+  animation: hero-enter 520ms ease-out both;
 }
 
+/* Styles for .hero-badge. */
 .hero-badge {
   display: inline-block;
   background: #1a2e1a;
@@ -72,8 +83,10 @@
   padding: 4px 14px;
   border-radius: 99px;
   margin-bottom: 1.5rem;
+  animation: badge-pop 420ms ease-out 120ms both;
 }
 
+/* Styles for .hero-title. */
 .hero-title {
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
@@ -82,10 +95,12 @@
   letter-spacing: -1px;
 }
 
+/* Styles for .hero-green. */
 .hero-green {
   color: #4caf50;
 }
 
+/* Styles for .hero-subtitle. */
 .hero-subtitle {
   font-size: 1.1rem;
   color: #888;
@@ -96,6 +111,7 @@
   margin-right: auto;
 }
 
+/* Styles for .hero-actions. */
 .hero-actions {
   display: flex;
   gap: 12px;
@@ -103,6 +119,7 @@
   flex-wrap: wrap;
 }
 
+/* Styles for .btn-primary. */
 .btn-primary {
   background: #2d6a2d;
   color: #fff;
@@ -115,10 +132,12 @@
   transition: background 0.2s;
 }
 
+/* Styles for .btn-primary:hover. */
 .btn-primary:hover {
   background: #3a8a3a;
 }
 
+/* Styles for .btn-secondary. */
 .btn-secondary {
   background: transparent;
   color: #aaa;
@@ -130,6 +149,7 @@
   transition: all 0.2s;
 }
 
+/* Styles for .btn-secondary:hover. */
 .btn-secondary:hover {
   border-color: #555;
   color: #fff;
@@ -145,24 +165,47 @@
   padding: 2rem 2rem 6rem;
 }
 
+/* Styles for .feature-card. */
 .feature-card {
   background: #111;
   border: 1px solid #1a1a1a;
   border-radius: 12px;
   padding: 1.5rem;
   transition: border-color 0.2s;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: card-rise 460ms ease-out forwards;
 }
 
+.feature-card:nth-child(1) {
+  animation-delay: 90ms;
+}
+
+.feature-card:nth-child(2) {
+  animation-delay: 170ms;
+}
+
+.feature-card:nth-child(3) {
+  animation-delay: 250ms;
+}
+
+.feature-card:nth-child(4) {
+  animation-delay: 330ms;
+}
+
+/* Styles for .feature-card:hover. */
 .feature-card:hover {
   border-color: #2d6a2d;
 }
 
+/* Styles for .feature-icon. */
 .feature-icon {
   font-size: 24px;
   display: block;
   margin-bottom: 12px;
 }
 
+/* Styles for .feature-card h3. */
 .feature-card h3 {
   font-size: 15px;
   font-weight: 600;
@@ -170,9 +213,56 @@
   margin: 0 0 8px;
 }
 
+/* Styles for .feature-card p. */
 .feature-card p {
   font-size: 13px;
   color: #666;
   line-height: 1.6;
   margin: 0;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes badge-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .hero-badge,
+  .feature-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }

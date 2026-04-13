@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* ====================================
    GLOBAL STYLES - Base & Reset
    Applied to entire application
@@ -12,10 +15,12 @@
   box-sizing: border-box;
 }
 
+/* Styles for html. */
 html {
   scroll-behavior: smooth;
 }
 
+/* Styles for body. */
 body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
@@ -34,22 +39,27 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text);
 }
 
+/* Styles for h1. */
 h1 {
   font-size: var(--font-size-3xl);
 }
 
+/* Styles for h2. */
 h2 {
   font-size: var(--font-size-2xl);
 }
 
+/* Styles for h3. */
 h3 {
   font-size: var(--font-size-xl);
 }
 
+/* Styles for h4. */
 h4 {
   font-size: var(--font-size-lg);
 }
 
+/* Styles for h5, h6. */
 h5, h6 {
   font-size: var(--font-size-base);
 }
@@ -68,6 +78,7 @@ a {
   transition: color var(--transition-fast);
 }
 
+/* Styles for a:hover. */
 a:hover {
   color: var(--color-primary-dark);
   text-decoration: underline;
@@ -86,6 +97,7 @@ button {
   color: var(--color-text);
 }
 
+/* Styles for button:hover. */
 button:hover {
   background-color: var(--color-bg-hover);
 }
@@ -93,6 +105,7 @@ button:hover {
 /* Form Elements */
 input,
 textarea,
+/* Styles for select. */
 select {
   font-family: inherit;
   font-size: var(--font-size-base);
@@ -107,12 +120,14 @@ select {
 
 input:focus,
 textarea:focus,
+/* Styles for select:focus. */
 select:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
+/* Styles for textarea. */
 textarea {
   resize: vertical;
   min-height: 6rem;
@@ -124,6 +139,7 @@ ul, ol {
   margin-bottom: var(--spacing-md);
 }
 
+/* Styles for li. */
 li {
   margin-bottom: var(--spacing-sm);
 }
@@ -143,6 +159,7 @@ main {
   padding: 0 var(--spacing-lg);
 }
 
+/* Styles for .sr-only. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -157,34 +174,42 @@ main {
 
 /* Mobile Responsive Base */
 @media (max-width: 640px) {
+/* Styles for html. */
   html {
     font-size: 14px;
   }
 
+/* Styles for body. */
   body {
     font-size: var(--font-size-sm);
   }
 
+/* Styles for main. */
   main {
     padding: var(--spacing-md);
   }
 
+/* Styles for .container. */
   .container {
     padding: 0 var(--spacing-md);
   }
 
+/* Styles for h1. */
   h1 {
     font-size: var(--font-size-2xl);
   }
 
+/* Styles for h2. */
   h2 {
     font-size: var(--font-size-xl);
   }
 
+/* Styles for h3. */
   h3 {
     font-size: var(--font-size-lg);
   }
 
+/* Styles for button. */
   button {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
@@ -192,11 +217,13 @@ main {
 
   input,
   textarea,
+/* Styles for select. */
   select {
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
   }
 
+/* Styles for textarea. */
   textarea {
     min-height: 5rem;
   }
@@ -204,10 +231,12 @@ main {
 
 /* Tablet Responsive */
 @media (min-width: 641px) and (max-width: 1024px) {
+/* Styles for main. */
   main {
     padding: var(--spacing-lg);
   }
 
+/* Styles for .container. */
   .container {
     padding: 0 var(--spacing-lg);
   }
@@ -215,10 +244,12 @@ main {
 
 /* Desktop and larger */
 @media (min-width: 1025px) {
+/* Styles for main. */
   main {
     padding: var(--spacing-2xl);
   }
 
+/* Styles for .container. */
   .container {
     padding: 0 var(--spacing-2xl);
   }

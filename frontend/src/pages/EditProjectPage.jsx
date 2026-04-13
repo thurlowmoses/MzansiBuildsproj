@@ -1,91 +1,14 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { deleteDoc, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import EditProjectForm from "../components/edit-project/EditProjectForm";
 import { auth, db } from "../firebase_config";
+import "../styles/edit-project.css";
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#0a0a0a",
-    padding: "2rem 1rem",
-  },
-  container: {
-    maxWidth: "600px",
-    margin: "0 auto",
-    background: "#111",
-    border: "1px solid #222",
-    borderRadius: "12px",
-    padding: "2rem",
-  },
-  pageHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "1.5rem",
-  },
-  title: {
-    fontSize: "1.4rem",
-    fontWeight: "700",
-    color: "#fff",
-    margin: 0,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.25rem",
-  },
-  group: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
-  },
-  label: {
-    fontSize: "13px",
-    fontWeight: "500",
-    color: "#aaa",
-  },
-  input: {
-    background: "#1a1a1a",
-    border: "1px solid #333",
-    borderRadius: "8px",
-    padding: "10px 12px",
-    color: "#fff",
-    fontSize: "14px",
-    outline: "none",
-    fontFamily: "inherit",
-    width: "100%",
-    boxSizing: "border-box",
-  },
-  deleteBtn: {
-    background: "transparent",
-    border: "1px solid #5a1a1a",
-    color: "#ef5350",
-    borderRadius: "8px",
-    padding: "8px 14px",
-    fontSize: "12px",
-    cursor: "pointer",
-  },
-  cancelBtn: {
-    flex: 1,
-    background: "transparent",
-    border: "1px solid #333",
-    color: "#666",
-    borderRadius: "8px",
-    padding: "11px",
-    fontSize: "14px",
-    cursor: "pointer",
-  },
-  saveBtn: {
-    flex: 2,
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    padding: "11px",
-    fontSize: "14px",
-    fontWeight: "600",
-  },
-};
-
+// Handles EditProjectPage.
 function EditProjectPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -103,6 +26,7 @@ function EditProjectPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Handles loadProject.
     const loadProject = async () => {
       if (!id) {
         setError("Project not found.");
@@ -145,11 +69,13 @@ function EditProjectPage() {
     loadProject();
   }, [id]);
 
+  // Handles onChange.
   const onChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handles handleUpdate.
   const handleUpdate = async (event) => {
     event.preventDefault();
     if (!id) return;
@@ -181,6 +107,7 @@ function EditProjectPage() {
     }
   };
 
+  // Handles handleDelete.
   const handleDelete = async () => {
     if (!id) return;
 
@@ -201,107 +128,42 @@ function EditProjectPage() {
 
   if (loading) {
     return (
-      <div style={styles.page}>
-        <p style={{ color: "#666", padding: "2rem" }}>Loading project...</p>
+      <div className="edit-project-page">
+        <p className="edit-project-loading">Loading project...</p>
       </div>
     );
   }
 
   if (error && !formData.title) {
     return (
-      <div style={styles.page}>
-        <p style={{ color: "#ef5350", padding: "2rem" }}>{error}</p>
+      <div className="edit-project-page">
+        <p className="edit-project-error">{error}</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <div style={styles.pageHeader}>
-          <h1 style={styles.title}>Edit project</h1>
-          <button onClick={handleDelete} disabled={deleting} style={styles.deleteBtn}>
+    <div className="edit-project-page">
+      <div className="edit-project-container">
+        <div className="edit-project-header">
+          <h1 className="edit-project-title">Edit project</h1>
+          <button onClick={handleDelete} disabled={deleting} className="edit-project-delete-btn">
             {deleting ? "Deleting..." : "Delete project"}
           </button>
         </div>
 
-        <form onSubmit={handleUpdate} style={styles.form}>
-          <div style={styles.group}>
-            <label style={styles.label}>Project title *</label>
-            <input name="title" value={formData.title} onChange={onChange} required style={styles.input} />
-          </div>
-
-          <div style={styles.group}>
-            <label style={styles.label}>Description *</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={onChange}
-              required
-              rows={4}
-              style={{ ...styles.input, resize: "vertical" }}
-            />
-          </div>
-
-          <div style={styles.group}>
-            <label style={styles.label}>Tech stack</label>
-            <input
-              name="techStack"
-              value={formData.techStack}
-              onChange={onChange}
-              placeholder="React, Python, Firebase"
-              style={styles.input}
-            />
-          </div>
-
-          <div style={styles.group}>
-            <label style={styles.label}>Current stage *</label>
-            <select name="stage" value={formData.stage} onChange={onChange} style={styles.input}>
-              <option value="idea">Idea</option>
-              <option value="building">Building</option>
-              <option value="beta">Beta</option>
-              <option value="completed">Completed - add to Celebration Wall</option>
-            </select>
-            {formData.stage === "completed" ? (
-              <p style={{ fontSize: "12px", color: "#4caf50", margin: "6px 0 0" }}>
-                Saving as completed will add you to the Celebration Wall.
-              </p>
-            ) : null}
-          </div>
-
-          <div style={styles.group}>
-            <label style={styles.label}>What support do you need?</label>
-            <textarea
-              name="supportNeeded"
-              value={formData.supportNeeded}
-              onChange={onChange}
-              rows={3}
-              style={{ ...styles.input, resize: "vertical" }}
-            />
-          </div>
-
-          {error ? <p style={{ color: "#ef5350", fontSize: "13px" }}>{error}</p> : null}
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button type="button" onClick={() => navigate(-1)} style={styles.cancelBtn}>
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              style={{
-                ...styles.saveBtn,
-                background: saving ? "#333" : "#2d6a2d",
-                cursor: saving ? "not-allowed" : "pointer",
-              }}
-            >
-              {saving ? "Saving..." : "Save changes"}
-            </button>
-          </div>
-        </form>
+        <EditProjectForm
+          formData={formData}
+          onChange={onChange}
+          onSubmit={handleUpdate}
+          saving={saving}
+          error={error}
+          onCancel={() => navigate(-1)}
+        />
       </div>
     </div>
   );
 }
 
 export default EditProjectPage;
+

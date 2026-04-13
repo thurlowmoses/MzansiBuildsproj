@@ -1,6 +1,10 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import React from "react";
 import "../styles/error-boundary.css";
 
+// Handles ErrorBoundary class.
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -35,3 +39,4 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
+

@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -18,6 +21,7 @@ import ProfilePage from "./pages/ProfilePage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 
+// Handles App.
 function App() {
   return (
     <ThemeProvider>
@@ -39,7 +43,7 @@ function App() {
               <Route path="/messages" element={<MessagesPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/:userId" element={<PublicProfilePage />} />
+              <Route path="/profile/:uid" element={<PublicProfilePage />} />
               <Route path="/celebration" element={<CelebrationWall />} />
               <Route path="/celebration-wall" element={<CelebrationWall />} />
               <Route path="/help" element={<HelpPage />} />
@@ -52,3 +56,4 @@ function App() {
 }
 
 export default App;
+

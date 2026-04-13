@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .messages-layout {
   max-width: 1200px;
   margin: 0 auto;
@@ -7,6 +10,7 @@
 }
 
 .messages-sidebar,
+/* Styles for .messages-thread. */
 .messages-thread {
   background: #111111;
   border: 1px solid rgba(16, 185, 129, 0.22);
@@ -14,31 +18,37 @@
   box-shadow: 0 20px 40px rgba(3, 8, 15, 0.45);
 }
 
+/* Styles for .messages-sidebar. */
 .messages-sidebar {
   padding: var(--spacing-lg);
   color: #d6dde8;
 }
 
+/* Styles for .messages-sidebar h1. */
 .messages-sidebar h1 {
   margin-bottom: var(--spacing-sm);
   color: #f8fafc;
 }
 
+/* Styles for .messages-sidebar p. */
 .messages-sidebar p {
   color: #d1d5db;
   margin-bottom: var(--spacing-md);
 }
 
+/* Styles for .messages-inbox-header. */
 .messages-inbox-header {
   margin-bottom: var(--spacing-sm);
 }
 
+/* Styles for .conversation-list. */
 .conversation-list {
   display: grid;
   gap: 8px;
   margin-bottom: var(--spacing-md);
 }
 
+/* Styles for .conversation-item. */
 .conversation-item {
   width: 100%;
   display: grid;
@@ -54,11 +64,13 @@
 }
 
 .conversation-item:hover,
+/* Styles for .conversation-item.active. */
 .conversation-item.active {
   border-color: rgba(16, 185, 129, 0.75);
   background: rgba(16, 185, 129, 0.11);
 }
 
+/* Styles for .conversation-avatar. */
 .conversation-avatar {
   width: 34px;
   height: 34px;
@@ -70,15 +82,18 @@
   color: #072114;
 }
 
+/* Styles for .conversation-meta. */
 .conversation-meta {
   min-width: 0;
   display: grid;
 }
 
+/* Styles for .conversation-meta strong. */
 .conversation-meta strong {
   color: #f8fafc;
 }
 
+/* Styles for .conversation-meta small. */
 .conversation-meta small {
   color: #d1d5db;
   white-space: nowrap;
@@ -86,11 +101,13 @@
   text-overflow: ellipsis;
 }
 
+/* Styles for .conversation-time. */
 .conversation-time {
   color: #d1d5db;
   font-size: 11px;
 }
 
+/* Styles for .developer-section-label. */
 .developer-section-label {
   margin: 0 0 8px;
   color: #d1d5db;
@@ -99,6 +116,7 @@
   letter-spacing: 0.6px;
 }
 
+/* Styles for .developer-search. */
 .developer-search {
   width: 100%;
   margin-bottom: var(--spacing-sm);
@@ -107,11 +125,13 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
+/* Styles for .developer-list. */
 .developer-list {
   display: grid;
   gap: var(--spacing-sm);
 }
 
+/* Styles for .developer-item. */
 .developer-item {
   display: flex;
   gap: var(--spacing-sm);
@@ -124,16 +144,19 @@
   padding: 10px 12px;
 }
 
+/* Styles for .developer-item.locked. */
 .developer-item.locked {
   border-style: dashed;
 }
 
 .developer-item.active,
+/* Styles for .developer-item:hover. */
 .developer-item:hover {
   border-color: rgba(16, 185, 129, 0.75);
   background: rgba(16, 185, 129, 0.12);
 }
 
+/* Styles for .developer-avatar. */
 .developer-avatar {
   width: 34px;
   height: 34px;
@@ -145,15 +168,18 @@
   color: #072114;
 }
 
+/* Styles for .developer-meta. */
 .developer-meta {
   display: grid;
   gap: 2px;
 }
 
+/* Styles for .developer-meta strong. */
 .developer-meta strong {
   color: #f8fafc;
 }
 
+/* Styles for .private-pill. */
 .private-pill {
   margin-left: 6px;
   font-size: 10px;
@@ -165,14 +191,17 @@
   padding: 1px 6px;
 }
 
+/* Styles for .developer-meta small. */
 .developer-meta small {
   color: #d1d5db;
 }
 
+/* Styles for .developer-actions. */
 .developer-actions {
   margin-left: auto;
 }
 
+/* Styles for .follow-btn. */
 .follow-btn {
   border: 1px solid rgba(16, 185, 129, 0.65);
   background: rgba(16, 185, 129, 0.13);
@@ -182,12 +211,14 @@
   padding: 5px 10px;
 }
 
+/* Styles for .follow-btn.following. */
 .follow-btn.following {
   border-color: rgba(148, 163, 184, 0.65);
   background: rgba(148, 163, 184, 0.15);
   color: #d6dfeb;
 }
 
+/* Styles for .messages-thread. */
 .messages-thread {
   padding: var(--spacing-lg);
   display: grid;
@@ -195,15 +226,18 @@
   min-height: 70vh;
 }
 
+/* Styles for .thread-header h2. */
 .thread-header h2 {
   color: #f8fafc;
   margin-bottom: 6px;
 }
 
+/* Styles for .thread-header p. */
 .thread-header p {
   color: #d1d5db;
 }
 
+/* Styles for .thread-head-main. */
 .thread-head-main {
   display: flex;
   justify-content: space-between;
@@ -211,11 +245,13 @@
   gap: 10px;
 }
 
+/* Styles for .thread-head-actions. */
 .thread-head-actions {
   display: inline-flex;
   gap: 8px;
 }
 
+/* Styles for .view-account-btn. */
 .view-account-btn {
   border-radius: 999px;
   border: 1px solid rgba(16, 185, 129, 0.6);
@@ -226,11 +262,13 @@
   font-weight: 700;
 }
 
+/* Styles for .view-account-btn:hover. */
 .view-account-btn:hover {
   border-color: rgba(16, 185, 129, 0.9);
   background: rgba(16, 185, 129, 0.2);
 }
 
+/* Styles for .account-preview-card. */
 .account-preview-card {
   margin-top: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -239,22 +277,26 @@
   padding: 12px;
 }
 
+/* Styles for .account-preview-card h3. */
 .account-preview-card h3 {
   margin: 0;
   color: #f8fafc;
 }
 
+/* Styles for .account-preview-card p. */
 .account-preview-card p {
   margin: 8px 0 0;
   color: #aac0d7;
 }
 
+/* Styles for .account-preview-card small. */
 .account-preview-card small {
   display: block;
   margin-top: 8px;
   color: #d1d5db;
 }
 
+/* Styles for .thread-messages. */
 .thread-messages {
   margin-top: var(--spacing-md);
   margin-bottom: var(--spacing-md);
@@ -264,6 +306,7 @@
   align-content: start;
 }
 
+/* Styles for .bubble. */
 .bubble {
   max-width: 72%;
   padding: 10px 12px;
@@ -271,36 +314,171 @@
   border: 1px solid transparent;
 }
 
+/* Styles for .bubble p. */
 .bubble p {
   margin: 0 0 5px;
   color: #f2f7ff;
 }
 
+/* Styles for .bubble small. */
 .bubble small {
   color: #d1d5db;
 }
 
+/* Styles for .message-attachment. */
+.message-attachment {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+/* Styles for .message-attachment-fileline. */
+.message-attachment-fileline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Styles for .message-file-type-icon. */
+.message-file-type-icon {
+  min-width: 32px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.14);
+  color: #bbf7d0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+/* Styles for .message-attachment-image-link. */
+.message-attachment-image-link {
+  display: inline-block;
+  max-width: 260px;
+}
+
+/* Styles for .message-attachment-image. */
+.message-attachment-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Styles for .message-attachment-open. */
+.message-attachment-open {
+  color: #86efac;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-size: 12px;
+}
+
+/* Styles for .message-attachment-size. */
+.message-attachment-size {
+  color: #d1d5db;
+  font-size: 11px;
+}
+
+/* Styles for .bubble.mine. */
 .bubble.mine {
   justify-self: end;
   background: rgba(16, 185, 129, 0.14);
   border-color: rgba(16, 185, 129, 0.5);
 }
 
+/* Styles for .bubble.theirs. */
 .bubble.theirs {
   justify-self: start;
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Styles for .thread-empty. */
 .thread-empty {
   color: #d1d5db;
 }
 
+/* Styles for .thread-compose. */
 .thread-compose {
   display: grid;
   gap: var(--spacing-sm);
 }
 
+/* Styles for .thread-compose.dragging. */
+.thread-compose.dragging {
+  outline: 2px dashed rgba(16, 185, 129, 0.75);
+  outline-offset: 8px;
+  border-radius: 10px;
+}
+
+/* Styles for .thread-dropzone. */
+.thread-dropzone {
+  border: 1px dashed rgba(255, 255, 255, 0.24);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px;
+}
+
+/* Styles for .thread-dropzone.active. */
+.thread-dropzone.active {
+  border-color: rgba(16, 185, 129, 0.75);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* Styles for .thread-compose-file-row. */
+.thread-compose-file-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Styles for .thread-file-label. */
+.thread-file-label {
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+/* Styles for .thread-file-meta. */
+.thread-file-meta {
+  margin: 0;
+  color: #c8d8ec;
+  font-size: 12px;
+}
+
+/* Styles for .thread-file-chip. */
+.thread-file-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 8px 10px;
+}
+
+/* Styles for .thread-file-clear. */
+.thread-file-clear {
+  margin-left: auto;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.12);
+  color: #fecaca;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Styles for .thread-file-clear:hover. */
+.thread-file-clear:hover {
+  border-color: rgba(239, 68, 68, 0.8);
+}
+
+/* Styles for .thread-compose textarea. */
 .thread-compose textarea {
   min-height: 88px;
   background: #0f1622;
@@ -308,6 +486,7 @@
   border: 1px solid rgba(255, 255, 255, 0.16);
 }
 
+/* Styles for .thread-compose button. */
 .thread-compose button {
   justify-self: end;
   background: linear-gradient(140deg, #10b981, #059669);
@@ -316,22 +495,34 @@
   padding: 10px 16px;
 }
 
+/* Styles for .thread-compose button:disabled. */
 .thread-compose button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
+/* Styles for .thread-private-note. */
 .thread-private-note {
   margin: 0;
   font-size: 12px;
   color: #f8be83;
 }
 
+/* Styles for .thread-send-error. */
+.thread-send-error {
+  margin: 0;
+  font-size: 12px;
+  color: #ff9ca1;
+}
+
+/* Styles for @media (max-width: 960px). */
 @media (max-width: 960px) {
+/* Styles for .messages-layout. */
   .messages-layout {
     grid-template-columns: 1fr;
   }
 
+/* Styles for .messages-thread. */
   .messages-thread {
     min-height: 60vh;
   }

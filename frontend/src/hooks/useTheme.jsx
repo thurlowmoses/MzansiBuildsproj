@@ -1,7 +1,11 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext();
 
+// Handles ThemeProvider.
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem("mzansi-theme");
@@ -31,6 +35,7 @@ export function ThemeProvider({ children }) {
   );
 }
 
+// Handles useTheme.
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) {
@@ -38,3 +43,4 @@ export function useTheme() {
   }
   return context;
 }
+

@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -15,10 +18,14 @@ import {
 import CollabSection from "../components/CollabSection";
 import CommentsSection from "../components/CommentsSection";
 import MilestoneSection from "../components/MilestoneSection";
+import ProjectStatusCard from "../components/project-detail/ProjectStatusCard";
+import ProjectSummary from "../components/project-detail/ProjectSummary";
 import { db } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
+import { formatAttachmentSize } from "../utils/fileUtils";
 import "../styles/project-detail.css";
 
+// Handles ProjectDetailPage.
 function ProjectDetailPage() {
   const { id: projectId } = useParams();
   const navigate = useNavigate();
@@ -125,6 +132,7 @@ function ProjectDetailPage() {
     return unsubscribe;
   }, [projectId]);
 
+  // Handles handleCompletionToggle.
   const handleCompletionToggle = async () => {
     if (!projectId || !project || !user) return;
 
@@ -218,60 +226,14 @@ function ProjectDetailPage() {
 
         {project ? (
           <>
-            <header className="detail-header">
-              <h1>{project.title}</h1>
-              <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
-                <span className="detail-stage">{project.stage || "idea"}</span>
-                {isOwner ? (
-                  <button
-                    type="button"
-                    className="completion-button"
-                    onClick={() => navigate(`/projects/${project.id}/edit`)}
-                  >
-                    Edit project
-                  </button>
-                ) : null}
-              </div>
-            </header>
+            <ProjectSummary project={project} isOwner={isOwner} onEditProject={() => navigate(`/projects/${project.id}/edit`)} formatAttachmentSize={formatAttachmentSize} />
 
-            <p className="detail-description">{project.description}</p>
-
-            {Array.isArray(project.techStack) && project.techStack.length > 0 ? (
-              <div className="detail-tags">
-                {project.techStack.map((tech) => (
-                  <span key={tech} className="detail-tag">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            ) : null}
-
-            <p className="detail-meta">Built by {project.userName || "Developer"}</p>
-
-            <section className="detail-card">
-              <h2>Project Status</h2>
-              <p>
-                Current status: <strong>{project.completed ? "Completed" : "In Progress"}</strong>
-              </p>
-              {project.completed ? (
-                <p className="detail-success">This project is on the Celebration Wall.</p>
-              ) : null}
-
-              {(!project.userId || user?.uid === project.userId) ? (
-                <button
-                  type="button"
-                  className="completion-button"
-                  onClick={handleCompletionToggle}
-                  disabled={completionLoading}
-                >
-                  {completionLoading
-                    ? "Updating..."
-                    : project.completed
-                      ? "Mark as In Progress"
-                      : "Mark as Completed"}
-                </button>
-              ) : null}
-            </section>
+            <ProjectStatusCard
+              project={project}
+              user={user}
+              completionLoading={completionLoading}
+              onToggleCompletion={handleCompletionToggle}
+            />
 
             <MilestoneSection
               projectId={projectId}
@@ -301,3 +263,4 @@ function ProjectDetailPage() {
 }
 
 export default ProjectDetailPage;
+

@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -12,6 +15,7 @@ import { auth, db } from "../firebase_config";
 
 const AuthContext = createContext(null);
 
+// Handles AuthProvider.
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,6 +30,7 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  // Handles register.
   const register = async ({ email, password, displayName }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -57,6 +62,7 @@ export function AuthProvider({ children }) {
     return user;
   };
 
+  // Handles login.
   const login = async ({ email, password }) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
@@ -102,6 +108,7 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// Handles useAuth.
 export function useAuth() {
   const context = useContext(AuthContext);
 
@@ -111,3 +118,4 @@ export function useAuth() {
 
   return context;
 }
+

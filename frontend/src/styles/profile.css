@@ -1,19 +1,25 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .profile-page {
   min-height: 100vh;
   background: #0a0a0a;
   padding: 2rem 1rem;
 }
 
+/* Styles for .profile-page-inner. */
 .profile-page-inner {
   max-width: 720px;
   margin: 0 auto;
 }
 
+/* Styles for .profile-loading. */
 .profile-loading {
   color: #4d4d4d;
   padding: 2rem;
 }
 
+/* Styles for .profile-topbar. */
 .profile-topbar {
   display: flex;
   gap: 1.25rem;
@@ -23,10 +29,12 @@
   border-bottom: 1px solid #1a1a1a;
 }
 
+/* Styles for .profile-avatar-wrap. */
 .profile-avatar-wrap {
   position: relative;
 }
 
+/* Styles for .profile-avatar-label. */
 .profile-avatar-label {
   cursor: pointer;
   display: block;
@@ -34,6 +42,7 @@
 }
 
 .profile-avatar-image,
+/* Styles for .profile-avatar-fallback. */
 .profile-avatar-fallback {
   width: 80px;
   height: 80px;
@@ -41,11 +50,13 @@
   border: 3px solid #2d6a2d;
 }
 
+/* Styles for .profile-avatar-image. */
 .profile-avatar-image {
   display: block;
   object-fit: cover;
 }
 
+/* Styles for .profile-avatar-fallback. */
 .profile-avatar-fallback {
   background: #1a3a1a;
   color: #4caf50;
@@ -56,6 +67,7 @@
   font-weight: 700;
 }
 
+/* Styles for .profile-avatar-overlay. */
 .profile-avatar-overlay {
   position: absolute;
   inset: 0;
@@ -71,19 +83,23 @@
   transition: opacity 0.2s;
 }
 
+/* Styles for .profile-avatar-label:hover .profile-avatar-overlay. */
 .profile-avatar-label:hover .profile-avatar-overlay {
   opacity: 1;
 }
 
+/* Styles for .profile-avatar-label:focus-within. */
 .profile-avatar-label:focus-within {
   border-radius: 50%;
   box-shadow: 0 0 0 3px #4caf50;
 }
 
+/* Styles for .profile-avatar-label:focus-within .profile-avatar-overlay. */
 .profile-avatar-label:focus-within .profile-avatar-overlay {
   opacity: 1;
 }
 
+/* Styles for .profile-hidden-input. */
 .profile-hidden-input {
   position: absolute;
   width: 1px;
@@ -96,10 +112,12 @@
   border: 0;
 }
 
+/* Styles for .profile-main-meta. */
 .profile-main-meta {
   flex: 1;
 }
 
+/* Styles for .profile-name. */
 .profile-name {
   font-size: 1.4rem;
   font-weight: 700;
@@ -107,12 +125,14 @@
   margin: 0 0 2px;
 }
 
+/* Styles for .profile-email. */
 .profile-email {
   font-size: 12px;
   color: #7d7d7d;
   margin: 0 0 6px;
 }
 
+/* Styles for .profile-bio. */
 .profile-bio {
   font-size: 13px;
   color: #cccccc;
@@ -120,6 +140,7 @@
   line-height: 1.5;
 }
 
+/* Styles for .profile-github-link. */
 .profile-github-link {
   font-size: 12px;
   color: #4caf50;
@@ -128,12 +149,14 @@
   margin-bottom: 10px;
 }
 
+/* Styles for .profile-stats-row. */
 .profile-stats-row {
   display: flex;
   gap: 1.5rem;
   margin-top: 8px;
 }
 
+/* Styles for .profile-stat-btn. */
 .profile-stat-btn {
   background: none;
   border: none;
@@ -148,18 +171,21 @@
 .profile-menu-btn:focus-visible,
 .profile-dropdown-item:focus-visible,
 .profile-btn:focus-visible,
+/* Styles for .profile-tab:focus-visible. */
 .profile-tab:focus-visible {
   outline: 2px solid #4caf50;
   outline-offset: 2px;
   box-shadow: 0 0 0 2px rgba(13, 31, 13, 0.85);
 }
 
+/* Styles for .profile-stat-num. */
 .profile-stat-num {
   font-size: 16px;
   font-weight: 700;
   color: #fff;
 }
 
+/* Styles for .profile-stat-label. */
 .profile-stat-label {
   font-size: 11px;
   color: #7d7d7d;
@@ -167,10 +193,12 @@
   letter-spacing: 0.05em;
 }
 
+/* Styles for .profile-menu-wrap. */
 .profile-menu-wrap {
   position: relative;
 }
 
+/* Styles for .profile-menu-btn. */
 .profile-menu-btn {
   background: none;
   border: 1px solid #333;
@@ -182,6 +210,7 @@
   letter-spacing: 2px;
 }
 
+/* Styles for .profile-dropdown. */
 .profile-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -194,6 +223,7 @@
   z-index: 200;
 }
 
+/* Styles for .profile-dropdown-item. */
 .profile-dropdown-item {
   display: block;
   width: 100%;
@@ -207,23 +237,28 @@
   border-radius: 6px;
 }
 
+/* Styles for .profile-dropdown-item:hover. */
 .profile-dropdown-item:hover {
   background: #181818;
 }
 
+/* Styles for .profile-dropdown-item:focus-visible. */
 .profile-dropdown-item:focus-visible {
   background: #181818;
 }
 
+/* Styles for .profile-dropdown-sep. */
 .profile-dropdown-sep {
   border-top: 1px solid #222;
   margin: 4px 0;
 }
 
+/* Styles for .profile-dropdown-danger. */
 .profile-dropdown-danger {
   color: #ef5350;
 }
 
+/* Styles for .profile-skills-row. */
 .profile-skills-row {
   display: flex;
   flex-wrap: wrap;
@@ -231,6 +266,7 @@
   margin-bottom: 1.5rem;
 }
 
+/* Styles for .profile-skill-pill. */
 .profile-skill-pill {
   background: #1a1a1a;
   border: 1px solid #333;
@@ -241,19 +277,23 @@
 }
 
 .profile-error,
+/* Styles for .profile-success. */
 .profile-success {
   font-size: 13px;
   margin: 0 0 1rem;
 }
 
+/* Styles for .profile-error. */
 .profile-error {
   color: #ef5350;
 }
 
+/* Styles for .profile-success. */
 .profile-success {
   color: #4caf50;
 }
 
+/* Styles for .profile-edit-form. */
 .profile-edit-form {
   background: #111;
   border: 1px solid #222;
@@ -262,12 +302,14 @@
   margin-bottom: 1.5rem;
 }
 
+/* Styles for .profile-edit-title. */
 .profile-edit-title {
   color: #fff;
   margin: 0 0 1rem;
   font-size: 15px;
 }
 
+/* Styles for .profile-field. */
 .profile-field {
   display: flex;
   flex-direction: column;
@@ -275,6 +317,7 @@
   margin-bottom: 1rem;
 }
 
+/* Styles for .profile-field label. */
 .profile-field label {
   font-size: 12px;
   color: #a5a5a5;
@@ -282,6 +325,7 @@
 }
 
 .profile-field input,
+/* Styles for .profile-field textarea. */
 .profile-field textarea {
   background: #1a1a1a;
   border: 1px solid #333;
@@ -295,11 +339,13 @@
   font-family: inherit;
 }
 
+/* Styles for .profile-edit-actions. */
 .profile-edit-actions {
   display: flex;
   gap: 10px;
 }
 
+/* Styles for .profile-btn. */
 .profile-btn {
   border-radius: 8px;
   padding: 10px 16px;
@@ -307,6 +353,7 @@
   cursor: pointer;
 }
 
+/* Styles for .profile-btn-save. */
 .profile-btn-save {
   flex: 2;
   background: #2d6a2d;
@@ -315,6 +362,7 @@
   font-weight: 600;
 }
 
+/* Styles for .profile-btn-cancel. */
 .profile-btn-cancel {
   flex: 1;
   background: transparent;
@@ -322,6 +370,7 @@
   color: #bbb;
 }
 
+/* Styles for .profile-btn-edit. */
 .profile-btn-edit {
   background: transparent;
   border: 1px solid #333;
@@ -330,12 +379,14 @@
   flex-shrink: 0;
 }
 
+/* Styles for .profile-tabs. */
 .profile-tabs {
   display: flex;
   border-bottom: 1px solid #1a1a1a;
   margin-bottom: 1.25rem;
 }
 
+/* Styles for .profile-tab. */
 .profile-tab {
   background: none;
   border: none;
@@ -347,21 +398,25 @@
   font-weight: 500;
 }
 
+/* Styles for .profile-tab.is-active. */
 .profile-tab.is-active {
   color: #4caf50;
   border-bottom-color: #4caf50;
 }
 
+/* Styles for .profile-tab:focus-visible. */
 .profile-tab:focus-visible {
   color: #4caf50;
 }
 
+/* Styles for .profile-list-col. */
 .profile-list-col {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Styles for .profile-empty-state. */
 .profile-empty-state {
   background: #0d0d0d;
   border: 1px dashed #1a1a1a;
@@ -371,6 +426,7 @@
   color: #a5a5a5;
 }
 
+/* Styles for .profile-project-card. */
 .profile-project-card {
   background: #111;
   border: 1px solid #222;
@@ -381,10 +437,12 @@
   gap: 10px;
 }
 
+/* Styles for .profile-project-main. */
 .profile-project-main {
   flex: 1;
 }
 
+/* Styles for .profile-project-headline. */
 .profile-project-headline {
   display: flex;
   align-items: center;
@@ -392,12 +450,14 @@
   margin-bottom: 4px;
 }
 
+/* Styles for .profile-stage-pill. */
 .profile-stage-pill {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
+/* Styles for .profile-stage-icon. */
 .profile-stage-icon {
   font-size: 12px;
   color: #9ccc65;
@@ -409,6 +469,7 @@
 .profile-stage-completed { color: #81c784; }
 .profile-stage-default { color: #888; }
 
+/* Styles for .profile-project-title. */
 .profile-project-title {
   font-size: 15px;
   font-weight: 600;
@@ -417,6 +478,7 @@
   cursor: pointer;
 }
 
+/* Styles for .profile-project-desc. */
 .profile-project-desc {
   font-size: 12px;
   color: #a5a5a5;
@@ -428,6 +490,7 @@
   -webkit-box-orient: vertical;
 }
 
+/* Styles for .profile-project-tech-row. */
 .profile-project-tech-row {
   display: flex;
   flex-wrap: wrap;
@@ -435,6 +498,7 @@
   margin-top: 6px;
 }
 
+/* Styles for .profile-tech-pill. */
 .profile-tech-pill {
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
@@ -444,6 +508,7 @@
   border-radius: 99px;
 }
 
+/* Styles for .profile-connection-card. */
 .profile-connection-card {
   display: flex;
   align-items: center;
@@ -457,6 +522,7 @@
   cursor: pointer;
 }
 
+/* Styles for .profile-connection-avatar. */
 .profile-connection-avatar {
   width: 40px;
   height: 40px;
@@ -473,6 +539,7 @@
   overflow: hidden;
 }
 
+/* Styles for .profile-connection-avatar-img. */
 .profile-connection-avatar-img {
   width: 100%;
   height: 100%;
@@ -480,6 +547,7 @@
   border-radius: 50%;
 }
 
+/* Styles for .profile-connection-name. */
 .profile-connection-name {
   font-size: 13px;
   font-weight: 600;
@@ -487,21 +555,26 @@
   margin: 0;
 }
 
+/* Styles for .profile-connection-meta. */
 .profile-connection-meta {
   font-size: 11px;
   color: #8d8d8d;
   margin: 0;
 }
 
+/* Styles for @media (max-width: 700px). */
 @media (max-width: 700px) {
+/* Styles for .profile-topbar. */
   .profile-topbar {
     flex-direction: column;
   }
 
+/* Styles for .profile-stats-row. */
   .profile-stats-row {
     gap: 1rem;
   }
 
+/* Styles for .profile-tabs. */
   .profile-tabs {
     overflow-x: auto;
   }

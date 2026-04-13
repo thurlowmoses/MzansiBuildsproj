@@ -1,8 +1,12 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* ====================================
    AUTH PAGE STYLES
    Login & Registration forms
    ==================================== */
 
+/* Styles for .auth-container. */
 .auth-container {
   max-width: 400px;
   margin: 3rem auto;
@@ -13,30 +17,35 @@
   box-shadow: var(--shadow-lg);
 }
 
+/* Styles for .auth-title. */
 .auth-title {
   text-align: center;
   margin-bottom: var(--spacing-lg);
   color: var(--color-black);
 }
 
+/* Styles for .auth-form. */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
 }
 
+/* Styles for .form-group. */
 .form-group {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
 
+/* Styles for .form-group label. */
 .form-group label {
   font-weight: 600;
   color: var(--color-black);
   font-size: var(--font-size-sm);
 }
 
+/* Styles for .form-group input. */
 .form-group input {
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-gray-medium);
@@ -44,12 +53,14 @@
   font-size: var(--font-size-base);
 }
 
+/* Styles for .form-group input:focus. */
 .form-group input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
+/* Styles for .auth-button. */
 .auth-button {
   background-color: var(--color-primary);
   color: var(--color-white);
@@ -62,14 +73,31 @@
   transition: background-color var(--transition-fast);
 }
 
+/* Styles for .auth-button:hover. */
 .auth-button:hover {
   background-color: var(--color-primary-dark);
 }
 
+/* Styles for .auth-resend-note. */
+.auth-resend-note {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
+}
+/* Styles for .auth-resend-btn. */
+.auth-resend-btn {
+  background: none;
+  border: none;
+  color: #4caf50;
+  cursor: pointer;
+  text-decoration: underline;
+}
+/* Styles for .auth-button:active. */
 .auth-button:active {
   opacity: 0.9;
 }
 
+/* Styles for .auth-toggle. */
 .auth-toggle {
   text-align: center;
   margin-top: var(--spacing-lg);
@@ -77,6 +105,7 @@
   color: var(--color-gray-dark);
 }
 
+/* Styles for .auth-toggle button. */
 .auth-toggle button {
   background: none;
   color: var(--color-primary);
@@ -88,16 +117,19 @@
   border: none;
 }
 
+/* Styles for .auth-toggle button:hover. */
 .auth-toggle button:hover {
   color: var(--color-primary-dark);
 }
 
+/* Styles for .password-hint. */
 .password-hint {
   margin: 0;
   font-size: var(--font-size-xs);
   color: var(--color-gray-dark);
 }
 
+/* Styles for .password-checklist. */
 .password-checklist {
   margin: var(--spacing-xs) 0 0;
   padding-left: 1rem;
@@ -105,32 +137,39 @@
   gap: 0.25rem;
 }
 
+/* Styles for .password-checklist li. */
 .password-checklist li {
   font-size: var(--font-size-xs);
   margin: 0;
 }
 
+/* Styles for .password-checklist li.passed. */
 .password-checklist li.passed {
   color: var(--color-success);
 }
 
+/* Styles for .password-checklist li.pending. */
 .password-checklist li.pending {
   color: var(--color-text-secondary);
 }
 
+/* Styles for .password-match. */
 .password-match {
   margin: 0;
   font-size: var(--font-size-xs);
 }
 
+/* Styles for .password-match.pass. */
 .password-match.pass {
   color: var(--color-success);
 }
 
+/* Styles for .password-match.fail. */
 .password-match.fail {
   color: var(--color-error);
 }
 
+/* Styles for .forgot-password-btn. */
 .forgot-password-btn {
   align-self: flex-start;
   background: none;
@@ -141,16 +180,19 @@
   font-size: var(--font-size-sm);
 }
 
+/* Styles for .forgot-password-btn:hover. */
 .forgot-password-btn:hover {
   color: var(--color-primary-dark);
 }
 
+/* Styles for .error-message. */
 .error-message {
   color: var(--color-error);
   font-size: var(--font-size-sm);
   margin-top: var(--spacing-sm);
 }
 
+/* Styles for .success-message. */
 .success-message {
   color: var(--color-success);
   font-size: var(--font-size-sm);

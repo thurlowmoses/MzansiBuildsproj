@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .notifications-page {
   min-height: 100vh;
   padding: 24px 16px 40px;
@@ -5,11 +8,13 @@
   color: #f8fafc;
 }
 
+/* Styles for .notifications-shell. */
 .notifications-shell {
   max-width: 860px;
   margin: 0 auto;
 }
 
+/* Styles for .notifications-header. */
 .notifications-header {
   display: flex;
   justify-content: space-between;
@@ -18,16 +23,19 @@
   margin-bottom: 18px;
 }
 
+/* Styles for .notifications-header h1. */
 .notifications-header h1 {
   margin: 0;
   font-size: 1.8rem;
 }
 
+/* Styles for .notifications-header p. */
 .notifications-header p {
   margin: 6px 0 0;
   color: #d1d5db;
 }
 
+/* Styles for .notifications-filters. */
 .notifications-filters {
   display: flex;
   gap: 8px;
@@ -35,6 +43,7 @@
   margin-bottom: 14px;
 }
 
+/* Styles for .notifications-filter. */
 .notifications-filter {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.05);
@@ -44,30 +53,36 @@
   font-size: 0.82rem;
 }
 
+/* Styles for .notifications-filter:hover. */
 .notifications-filter:hover {
   border-color: rgba(16, 185, 129, 0.65);
   color: #bbf7d0;
 }
 
+/* Styles for .notifications-filter.active. */
 .notifications-filter.active {
   border-color: rgba(16, 185, 129, 0.85);
   background: rgba(16, 185, 129, 0.14);
   color: #bbf7d0;
 }
 
+/* Styles for .notifications-error. */
 .notifications-error {
   color: #ef4444;
 }
 
+/* Styles for .notifications-empty. */
 .notifications-empty {
   color: #d1d5db;
 }
 
+/* Styles for .notifications-list. */
 .notifications-list {
   display: grid;
   gap: 12px;
 }
 
+/* Styles for .notification-card. */
 .notification-card {
   width: 100%;
   display: grid;
@@ -82,10 +97,12 @@
   color: inherit;
 }
 
+/* Styles for .notification-card.unread. */
 .notification-card.unread {
   border-color: rgba(16, 185, 129, 0.4);
 }
 
+/* Styles for .notification-avatar. */
 .notification-avatar {
   width: 48px;
   height: 48px;
@@ -98,36 +115,43 @@
   font-weight: 700;
 }
 
+/* Styles for .notification-avatar img. */
 .notification-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
+/* Styles for .notification-content. */
 .notification-content {
   min-width: 0;
 }
 
+/* Styles for .notification-topline. */
 .notification-topline {
   display: flex;
   justify-content: space-between;
   gap: 12px;
 }
 
+/* Styles for .notification-topline strong. */
 .notification-topline strong {
   color: #f8fafc;
 }
 
 .notification-topline span,
+/* Styles for .notification-content small. */
 .notification-content small {
   color: #d1d5db;
 }
 
+/* Styles for .notification-content p. */
 .notification-content p {
   margin: 6px 0 0;
   color: #d9e6f5;
 }
 
+/* Styles for .notification-message-btn. */
 .notification-message-btn {
   margin-top: 8px;
   border: 1px solid rgba(147, 197, 253, 0.55);
@@ -139,17 +163,20 @@
   font-weight: 700;
 }
 
+/* Styles for .notification-message-btn:hover. */
 .notification-message-btn:hover {
   border-color: rgba(96, 165, 250, 0.85);
   background: rgba(96, 165, 250, 0.18);
   color: #eff6ff;
 }
 
+/* Styles for .notification-state. */
 .notification-state {
   font-size: 12px;
   color: #d1d5db;
 }
 
+/* Styles for .load-more-btn. */
 .load-more-btn {
   margin: 14px auto 0;
   display: block;
@@ -161,15 +188,19 @@
   font-weight: 700;
 }
 
+/* Styles for .load-more-btn:hover. */
 .load-more-btn:hover {
   background: rgba(16, 185, 129, 0.2);
 }
 
+/* Styles for @media (max-width: 720px). */
 @media (max-width: 720px) {
+/* Styles for .notification-card. */
   .notification-card {
     grid-template-columns: 48px 1fr;
   }
 
+/* Styles for .notification-state. */
   .notification-state {
     grid-column: 2;
     justify-self: end;

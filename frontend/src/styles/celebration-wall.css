@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 .celebration-page {
   min-height: 100vh;
   background: #050505;
@@ -5,24 +8,29 @@
   padding: 2rem 1rem;
 }
 
+/* Styles for .celebration-container. */
 .celebration-container {
   max-width: 1000px;
   margin: 0 auto;
 }
 
+/* Styles for .celebration-container h1. */
 .celebration-container h1 {
   margin: 0;
 }
 
+/* Styles for .celebration-subtitle. */
 .celebration-subtitle {
   color: #9ca3af;
   margin-top: 0.5rem;
 }
 
+/* Styles for .celebration-error. */
 .celebration-error {
   color: #ef4444;
 }
 
+/* Styles for .celebration-grid. */
 .celebration-grid {
   margin-top: 1rem;
   display: grid;
@@ -30,6 +38,7 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
+/* Styles for .celebration-card. */
 .celebration-card {
   background: #111;
   border: 1px solid #1f2937;
@@ -37,23 +46,27 @@
   padding: 1rem;
 }
 
+/* Styles for .celebration-card h2. */
 .celebration-card h2 {
   margin-top: 0;
   margin-bottom: 0.5rem;
   font-size: 1.05rem;
 }
 
+/* Styles for .celebration-card p. */
 .celebration-card p {
   margin: 0;
   color: #d1d5db;
 }
 
+/* Styles for .celebration-meta. */
 .celebration-meta {
   margin-top: 0.7rem;
   color: #a7f3d0;
   font-size: 0.85rem;
 }
 
+/* Styles for .celebration-tags. */
 .celebration-tags {
   margin-top: 0.65rem;
   display: flex;
@@ -61,6 +74,7 @@
   gap: 0.45rem;
 }
 
+/* Styles for .celebration-tags span. */
 .celebration-tags span {
   background: #0f172a;
   border: 1px solid #334155;
@@ -70,6 +84,7 @@
   font-size: 0.72rem;
 }
 
+/* Styles for .celebration-link. */
 .celebration-link {
   display: inline-block;
   margin-top: 0.8rem;
@@ -77,14 +92,17 @@
   text-decoration: none;
 }
 
+/* Styles for .celebration-link:hover. */
 .celebration-link:hover {
   text-decoration: underline;
 }
 
+/* Styles for .celebration-breakthroughs. */
 .celebration-breakthroughs {
   margin-top: 2rem;
 }
 
+/* Styles for .celebration-breakthrough-title. */
 .celebration-breakthrough-title {
   margin: 0;
   font-size: 1.25rem;

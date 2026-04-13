@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import CodeBlock from "../components/CodeBlock";
@@ -5,6 +8,7 @@ import { streamHelpResponse } from "../api/backendClient";
 import { getHelpResponse, suggestedQuestions } from "../utils/helpAssistant";
 import "../styles/help.css";
 
+// Handles HelpPage.
 function HelpPage() {
   const location = useLocation();
   const [question, setQuestion] = useState("");
@@ -32,6 +36,7 @@ useEffect(() => {
   }, [location.search]);
 
   
+  // Handles askQuestion.
   const askQuestion = async (text) => {
 	// Append the prompt and the assistant reply together.
     const cleaned = text.trim();
@@ -91,6 +96,7 @@ useEffect(() => {
     }
   };
 
+  // Handles onSubmit.
   const onSubmit = (event) => {
     event.preventDefault();
     void askQuestion(question);
@@ -180,3 +186,4 @@ useEffect(() => {
 }
 
 export default HelpPage;
+

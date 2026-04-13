@@ -1,102 +1,17 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";
+import DiscoveryCard from "../components/DiscoveryCard";
 import useGitHubProjects from "../hooks/useGitHubProjects";
 import { db } from "../firebase_config";
+import { getTimestampMs } from "../utils/timeUtils";
 import "../styles/feed.css";
 import "../styles/discovery.css";
 
-const STAGE_CLASS = {
-  idea: "stage-idea",
-  building: "stage-building",
-  beta: "stage-beta",
-  completed: "stage-completed",
-};
-
-function getTimeValue(value) {
-  if (!value) return 0;
-  if (typeof value === "object" && typeof value.seconds === "number") {
-    return value.seconds * 1000;
-  }
-  const parsed = new Date(value).getTime();
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function DiscoveryCard({ project, onOpenProfile, onOpenProject, trendingLabel }) {
-  const stage = project.stage || "building";
-  const stageClass = STAGE_CLASS[stage] || STAGE_CLASS.building;
-  const canOpenProfile = Boolean(project.userId) && !project.isGitHub;
-  const profilePath = canOpenProfile ? `/profile/${project.userId}` : "";
-
-  const openProfile = () => {
-    if (!canOpenProfile) return;
-    onOpenProfile(profilePath);
-  };
-
-  return (
-    <article className="project-card discovery-card">
-      <header className="card-header">
-        {canOpenProfile ? (
-          <button type="button" className="avatar-link" onClick={openProfile} aria-label={`View ${project.userName || "Developer"} profile`}>
-            {project.userPhotoURL ? (
-              <img src={project.userPhotoURL} alt={`${project.userName || "Developer"} profile`} className="avatar avatar-img" />
-            ) : (
-              <div className="avatar">{(project.userName || "D")[0].toUpperCase()}</div>
-            )}
-          </button>
-        ) : project.userPhotoURL ? (
-          <img src={project.userPhotoURL} alt={`${project.userName || "Developer"} profile`} className="avatar avatar-img" />
-        ) : (
-          <div className="avatar">{(project.userName || "D")[0].toUpperCase()}</div>
-        )}
-
-        <div className="card-meta">
-          {canOpenProfile ? (
-            <button type="button" className="card-username card-username-link" onClick={openProfile}>
-              {project.userName || "Developer"}
-            </button>
-          ) : (
-            <p className="card-username">{project.userName || "Developer"}</p>
-          )}
-          <p className="card-time">
-            {project.isGitHub ? <span className="github-badge">GitHub</span> : <span className="github-badge mzanzi-badge">Mzansi</span>}
-            {project.stars?.toLocaleString ? `${project.stars.toLocaleString()} stars` : project.isGitHub ? "Trending project" : "Building in public"}
-          </p>
-        </div>
-
-        <span className={`stage-badge ${stageClass}`}>{stage}</span>
-      </header>
-
-      <div className="card-body">
-        <h3 className="card-title" onClick={() => onOpenProject(project)}>
-          {project.title}
-          {project.isGitHub ? <span className="external-icon"> ↗</span> : null}
-        </h3>
-
-        <p className="card-description">{project.description}</p>
-
-        {!project.isGitHub && trendingLabel ? <span className="trend-pill">{trendingLabel}</span> : null}
-
-        {!project.isGitHub && project.supportNeeded ? (
-          <div className="support-box">
-            <span className="support-label">Struggling with:</span> {project.supportNeeded}
-          </div>
-        ) : null}
-
-        {Array.isArray(project.techStack) && project.techStack.length > 0 ? (
-          <div className="tech-stack">
-            {project.techStack.map((tech) => (
-              <span key={`${project.id}-${tech}`} className="tech-pill">
-                {tech}
-              </span>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </article>
-  );
-}
-
+// Handles DiscoveryPage.
 function DiscoveryPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("mzansi");
@@ -120,7 +35,11 @@ function DiscoveryPage() {
           .map((docItem) => ({ id: docItem.id, ...(docItem.data() || {}) }))
           .filter((project) => !project.isGitHub);
 
-        items.sort((a, b) => getTimeValue(b.updatedAt || b.createdAt) - getTimeValue(a.updatedAt || a.createdAt));
+        items.sort(
+          (a, b) =>
+            getTimestampMs(b.updatedAt || b.createdAt) -
+            getTimestampMs(a.updatedAt || a.createdAt)
+        );
 
         setMzansiProjects(items);
         setMzansiLoading(false);
@@ -139,6 +58,7 @@ function DiscoveryPage() {
   const trendingGitHub = useMemo(() => githubProjects.slice(0, 4), [githubProjects]);
   const latestGitHub = useMemo(() => githubProjects.slice(4, githubVisibleCount), [githubProjects, githubVisibleCount]);
 
+  // Handles openProject.
   const openProject = (project) => {
     if (project.isGitHub) {
       window.open(project.githubUrl, "_blank", "noopener,noreferrer");
@@ -156,6 +76,7 @@ function DiscoveryPage() {
     setGithubVisibleCount(8);
   }, [githubProjects.length]);
 
+  // Handles openProfile.
   const openProfile = (profilePath) => {
     navigate(profilePath);
   };

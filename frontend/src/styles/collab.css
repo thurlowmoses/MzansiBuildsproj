@@ -1,3 +1,6 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
 /* collab.css */
 
 .collab-section {
@@ -8,6 +11,7 @@
   margin-bottom: 1.25rem;
 }
 
+/* Styles for .collab-section h2. */
 .collab-section h2 {
   font-size: 16px;
   font-weight: 600;
@@ -15,18 +19,21 @@
   margin: 0 0 1rem;
 }
 
+/* Styles for .collab-error. */
 .collab-error {
   color: #ef5350;
   font-size: 13px;
   margin: 0 0 10px;
 }
 
+/* Styles for .collab-form. */
 .collab-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Styles for .collab-form textarea. */
 .collab-form textarea {
   background: #1a1a1a;
   border: 1px solid #333;
@@ -39,12 +46,14 @@
   outline: none;
 }
 
+/* Styles for .collab-form textarea:focus. */
 .collab-form textarea:focus {
   border-color: #2d6a2d;
 }
 
 .collab-submit-btn,
 .collab-message-btn,
+/* Styles for .collab-message-link. */
 .collab-message-link {
   background: #2d6a2d;
   color: #fff;
@@ -55,11 +64,13 @@
   cursor: pointer;
 }
 
+/* Styles for .collab-submit-btn:disabled. */
 .collab-submit-btn:disabled {
   background: #333;
   cursor: not-allowed;
 }
 
+/* Styles for .collab-success-box. */
 .collab-success-box {
   border: 1px solid #2d6a2d;
   background: #0d1f0d;
@@ -67,36 +78,42 @@
   padding: 12px;
 }
 
+/* Styles for .collab-success-title. */
 .collab-success-title {
   color: #4caf50;
   font-weight: 700;
   margin: 0 0 4px;
 }
 
+/* Styles for .collab-success-sub. */
 .collab-success-sub {
   color: #b9d6b9;
   margin: 0 0 8px;
   font-size: 13px;
 }
 
+/* Styles for .collab-request-list. */
 .collab-request-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* Styles for .collab-requests-heading. */
 .collab-requests-heading {
   color: #9ad19a;
   margin: 0;
   font-size: 13px;
 }
 
+/* Styles for .collab-request-empty. */
 .collab-request-empty {
   color: #777;
   margin: 0;
   font-size: 13px;
 }
 
+/* Styles for .collab-request-item. */
 .collab-request-item {
   background: #0d0d0d;
   border: 1px solid #1a1a1a;
@@ -104,6 +121,7 @@
   padding: 12px;
 }
 
+/* Styles for .collab-request-header. */
 .collab-request-header {
   display: flex;
   align-items: center;
@@ -111,6 +129,7 @@
   margin-bottom: 8px;
 }
 
+/* Styles for .collab-requester-avatar. */
 .collab-requester-avatar {
   width: 32px;
   height: 32px;
@@ -125,6 +144,7 @@
   font-size: 12px;
 }
 
+/* Styles for .collab-requester-name. */
 .collab-requester-name {
   margin: 0;
   color: #fff;
@@ -132,6 +152,7 @@
   font-weight: 600;
 }
 
+/* Styles for .collab-request-status. */
 .collab-request-status {
   display: inline-block;
   margin-top: 2px;
@@ -139,12 +160,14 @@
   color: #b9b9b9;
 }
 
+/* Styles for .collab-request-message. */
 .collab-request-message {
   margin: 0;
   color: #a8a8a8;
   font-size: 13px;
 }
 
+/* Styles for .collab-message-link. */
 .collab-message-link {
   margin-left: auto;
   background: transparent;

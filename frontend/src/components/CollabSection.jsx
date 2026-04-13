@@ -1,3 +1,6 @@
+// Purpose: Project source file used by the MzansiBuilds application.
+// Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,6 +14,7 @@ import {
 import { db } from "../firebase_config";
 import "../styles/collab.css";
 
+// Handles CollabSection.
 const CollabSection = ({ projectId, project, requests, user }) => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
@@ -20,6 +24,7 @@ const CollabSection = ({ projectId, project, requests, user }) => {
 
   const isOwner = project?.userId === user?.uid;
 
+  // Handles handleRaiseHand.
   const handleRaiseHand = async (event) => {
     event.preventDefault();
 
@@ -150,3 +155,4 @@ const CollabSection = ({ projectId, project, requests, user }) => {
 };
 
 export default CollabSection;
+

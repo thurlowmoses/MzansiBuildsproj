@@ -1,0 +1,148 @@
+/* Purpose: Defines presentation rules for this UI surface. */
+/* Notes: Auto-annotated to improve maintainability and onboarding. */
+
+.edit-project-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 2rem 1rem;
+}
+
+/* Styles for .edit-project-container. */
+.edit-project-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+/* Styles for .edit-project-header. */
+.edit-project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+/* Styles for .edit-project-title. */
+.edit-project-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+/* Styles for .edit-project-form. */
+.edit-project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Styles for .edit-project-group. */
+.edit-project-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Styles for .edit-project-label. */
+.edit-project-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+}
+
+/* Styles for .edit-project-input. */
+.edit-project-input {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Styles for .edit-project-textarea. */
+.edit-project-textarea {
+  resize: vertical;
+}
+
+/* Styles for .edit-project-delete-btn. */
+.edit-project-delete-btn {
+  background: transparent;
+  border: 1px solid #5a1a1a;
+  color: #ef5350;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Styles for .edit-project-actions. */
+.edit-project-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Styles for .edit-project-btn. */
+.edit-project-btn {
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 14px;
+}
+
+/* Styles for .edit-project-cancel. */
+.edit-project-cancel {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  cursor: pointer;
+}
+
+/* Styles for .edit-project-save. */
+.edit-project-save {
+  flex: 2;
+  color: #fff;
+  border: none;
+  background: #2d6a2d;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Styles for .edit-project-save.disabled. */
+.edit-project-save.disabled {
+  background: #333;
+  cursor: not-allowed;
+}
+
+/* Styles for .edit-project-error. */
+.edit-project-error {
+  color: #ef5350;
+  padding: 2rem;
+}
+
+/* Styles for .edit-project-error-inline. */
+.edit-project-error-inline {
+  color: #ef5350;
+  font-size: 13px;
+}
+
+/* Styles for .edit-project-loading. */
+.edit-project-loading {
+  color: #666;
+  padding: 2rem;
+}
+
+/* Styles for .edit-project-completed-note. */
+.edit-project-completed-note {
+  font-size: 12px;
+  color: #4caf50;
+  margin: 6px 0 0;
+}
