@@ -2,10 +2,11 @@
 // Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
 
 import { useEffect, useRef, useState } from "react";
-import { sendPasswordResetEmail, updateProfile } from "firebase/auth";
+import { deleteUser, sendPasswordResetEmail, signOut, updateProfile } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -246,6 +247,71 @@ const useProfilePageData = ({ user }) => {
     }
   };
 
+  // Handles handleTogglePrivacy.
+  const handleTogglePrivacy = async () => {
+    if (!user?.uid) return;
+
+    try {
+      const nextValue = !profile?.isPrivate;
+      const confirmed = window.confirm(
+        nextValue
+          ? "Are you sure you want to make your profile private? Only approved/following users will be able to access it."
+          : "Are you sure you want to make your profile public? Anyone on MzansiBuilds will be able to view it."
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          isPrivate: nextValue,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      setSuccess(nextValue ? "Your profile is now private." : "Your profile is now public.");
+      setShowMenu(false);
+    } catch {
+      setError("Could not update profile privacy.");
+    }
+  };
+
+  // Handles handleSignOut.
+  const handleSignOut = async () => {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+    if (!confirmed) return;
+
+    await signOut(auth);
+    setShowMenu(false);
+  };
+
+  // Handles handleDeleteAccount.
+  const handleDeleteAccount = async () => {
+    if (!auth.currentUser || !user?.uid) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account permanently? This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteDoc(doc(db, "users", user.uid));
+      await deleteUser(auth.currentUser);
+      setShowMenu(false);
+      return { deleted: true };
+    } catch (err) {
+      if (err?.code === "auth/requires-recent-login") {
+        setError("Please log in again before deleting your account.");
+        return { deleted: false, requiresRecentLogin: true };
+      }
+      setError("Could not delete account.");
+      return { deleted: false };
+    }
+  };
+
   return {
     profile,
     projects,
@@ -269,6 +335,9 @@ const useProfilePageData = ({ user }) => {
     handleAvatarChange,
     handleSave,
     handlePasswordReset,
+    handleTogglePrivacy,
+    handleSignOut,
+    handleDeleteAccount,
   };
 };
 

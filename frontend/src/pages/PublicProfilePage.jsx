@@ -16,6 +16,7 @@ import {
   where,
 } from "firebase/firestore";
 import PublicProfileHeader from "../components/public-profile/PublicProfileHeader";
+import PublicProfileConnections from "../components/public-profile/PublicProfileConnections";
 import PublicProfileProjects from "../components/public-profile/PublicProfileProjects";
 import { db } from "../firebase_config";
 import { useAuth } from "../hooks/useAuth";
@@ -36,6 +37,9 @@ const PublicProfilePage = () => {
   const [followDocId, setFollowDocId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("projects");
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -66,6 +70,20 @@ const PublicProfilePage = () => {
     loadProfile();
   }, [uid]);
 
+  const fetchUserProfiles = async (ids) => {
+    if (!ids.length) return [];
+
+    const rows = await Promise.all(
+      ids.map(async (id) => {
+        const snapshot = await getDoc(doc(db, "users", id));
+        if (!snapshot.exists()) return null;
+        return { uid: id, ...snapshot.data() };
+      })
+    );
+
+    return rows.filter(Boolean);
+  };
+
   useEffect(() => {
     if (!uid) return;
 
@@ -88,8 +106,21 @@ const PublicProfilePage = () => {
     const followersQ = query(collection(db, "follows"), where("followingId", "==", uid));
     const followingQ = query(collection(db, "follows"), where("followerId", "==", uid));
 
-    const unsubFollowers = onSnapshot(followersQ, (snapshot) => setFollowerCount(snapshot.size));
-    const unsubFollowing = onSnapshot(followingQ, (snapshot) => setFollowingCount(snapshot.size));
+    const unsubFollowers = onSnapshot(followersQ, async (snapshot) => {
+      setFollowerCount(snapshot.size);
+      const ids = snapshot.docs
+        .map((docItem) => (docItem.data() || {}).followerId)
+        .filter(Boolean);
+      setFollowers(await fetchUserProfiles(ids));
+    });
+
+    const unsubFollowing = onSnapshot(followingQ, async (snapshot) => {
+      setFollowingCount(snapshot.size);
+      const ids = snapshot.docs
+        .map((docItem) => (docItem.data() || {}).followingId)
+        .filter(Boolean);
+      setFollowing(await fetchUserProfiles(ids));
+    });
 
     return () => {
       unsubFollowers();
@@ -203,6 +234,21 @@ const PublicProfilePage = () => {
   return (
     <div className="profile-page public-profile-page">
       <div className="profile-page-inner public-profile-shell">
+        <PublicProfileHeader
+          avatarUrl={avatarUrl}
+          displayName={displayName}
+          profile={profile}
+          projectsCount={projects.length}
+          followerCount={followerCount}
+          followingCount={followingCount}
+          user={user}
+          isFollowing={isFollowing}
+          followLoading={followLoading}
+          onFollowToggle={isFollowing ? handleUnfollow : handleFollow}
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+        />
+
         {Array.isArray(profile?.skills) && profile.skills.length > 0 ? (
           <div className="profile-skills-row public-profile-actions">
             {profile.skills.map((skill) => (
@@ -217,27 +263,45 @@ const PublicProfilePage = () => {
           <button type="button" className="profile-tab is-active">
             Projects
           </button>
-          <button type="button" className="profile-tab" onClick={() => navigate(`/profile/${uid}#followers`)}>
+          <button
+            type="button"
+            className={`profile-tab ${activeTab === "followers" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("followers")}
+          >
             Followers
           </button>
-          <button type="button" className="profile-tab" onClick={() => navigate(`/profile/${uid}#following`)}>
+          <button
+            type="button"
+            className={`profile-tab ${activeTab === "following" ? "is-active" : ""}`}
+            onClick={() => setActiveTab("following")}
+          >
             Following
           </button>
         </div>
 
-        <PublicProfileHeader
-          avatarUrl={avatarUrl}
-          displayName={displayName}
-          profile={profile}
-          projectsCount={projects.length}
-          followerCount={followerCount}
-          followingCount={followingCount}
-          user={user}
-          isFollowing={isFollowing}
-          followLoading={followLoading}
-          onFollowToggle={isFollowing ? handleUnfollow : handleFollow}
-        />
-        <PublicProfileProjects projects={projects} displayName={displayName} stageColor={stageColor} />
+        {activeTab === "projects" ? (
+          <PublicProfileProjects
+            projects={projects}
+            displayName={displayName}
+            stageColor={stageColor}
+          />
+        ) : null}
+
+        {activeTab === "followers" ? (
+          <PublicProfileConnections
+            rows={followers}
+            emptyMessage="No followers yet."
+            onOpenProfile={(targetUid) => navigate(`/profile/${targetUid}`)}
+          />
+        ) : null}
+
+        {activeTab === "following" ? (
+          <PublicProfileConnections
+            rows={following}
+            emptyMessage="Not following anyone yet."
+            onOpenProfile={(targetUid) => navigate(`/profile/${targetUid}`)}
+          />
+        ) : null}
       </div>
     </div>
   );

@@ -37,6 +37,9 @@ const ProfilePage = () => {
     handleAvatarChange,
     handleSave,
     handlePasswordReset,
+    handleTogglePrivacy,
+    handleSignOut,
+    handleDeleteAccount,
   } = useProfilePageData({ user });
 
   if (loading) {
@@ -76,12 +79,17 @@ const ProfilePage = () => {
             setShowMenu(false);
           }}
           onResetPassword={handlePasswordReset}
-          onGoSettings={() => navigate("/settings")}
+          isPrivate={Boolean(profile?.isPrivate)}
+          onTogglePrivacy={handleTogglePrivacy}
           onSignOut={async () => {
-            const { signOut } = await import("firebase/auth");
-            const { auth } = await import("../firebase_config");
-            await signOut(auth);
+            await handleSignOut();
             navigate("/auth");
+          }}
+          onDeleteAccount={async () => {
+            const result = await handleDeleteAccount();
+            if (result?.deleted) {
+              navigate("/auth");
+            }
           }}
         />
 

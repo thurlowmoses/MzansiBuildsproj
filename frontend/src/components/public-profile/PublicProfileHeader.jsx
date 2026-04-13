@@ -12,12 +12,18 @@ const PublicProfileHeader = ({
   isFollowing,
   followLoading,
   onFollowToggle,
+  activeTab,
+  onSelectTab,
 }) => {
   return (
     <div className="profile-topbar public-profile-header">
       <div className="profile-avatar-wrap">
         {avatarUrl ? (
-          <img src={avatarUrl} alt={displayName} className="profile-avatar-image public-profile-avatar-img" />
+          <img
+            src={avatarUrl}
+            alt={displayName}
+            className="profile-avatar-image public-profile-avatar-img"
+          />
         ) : (
           <div className="profile-avatar-fallback public-profile-avatar public-profile-avatar-fallback">
             {displayName[0].toUpperCase()}
@@ -36,18 +42,36 @@ const PublicProfileHeader = ({
         ) : null}
 
         <div className="profile-stats-row public-profile-tags">
-          <div className="profile-stat-btn public-profile-tags-item">
+          <button
+            type="button"
+            className={`profile-stat-btn public-profile-tags-item ${
+              activeTab === "projects" ? "public-profile-stat-active" : ""
+            }`}
+            onClick={() => onSelectTab("projects")}
+          >
             <span className="profile-stat-num">{projectsCount}</span>
             <span className="profile-stat-label">projects</span>
-          </div>
-          <div className="profile-stat-btn public-profile-tags-item">
+          </button>
+          <button
+            type="button"
+            className={`profile-stat-btn public-profile-tags-item ${
+              activeTab === "followers" ? "public-profile-stat-active" : ""
+            }`}
+            onClick={() => onSelectTab("followers")}
+          >
             <span className="profile-stat-num">{followerCount}</span>
             <span className="profile-stat-label">followers</span>
-          </div>
-          <div className="profile-stat-btn public-profile-tags-item">
+          </button>
+          <button
+            type="button"
+            className={`profile-stat-btn public-profile-tags-item ${
+              activeTab === "following" ? "public-profile-stat-active" : ""
+            }`}
+            onClick={() => onSelectTab("following")}
+          >
             <span className="profile-stat-num">{followingCount}</span>
             <span className="profile-stat-label">following</span>
-          </div>
+          </button>
         </div>
       </div>
 

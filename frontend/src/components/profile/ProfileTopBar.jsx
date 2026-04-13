@@ -19,8 +19,10 @@ const ProfileTopBar = ({
   onToggleMenu,
   onStartEdit,
   onResetPassword,
-  onGoSettings,
+  isPrivate,
+  onTogglePrivacy,
   onSignOut,
+  onDeleteAccount,
 }) => {
   return (
     <div className="profile-topbar">
@@ -71,22 +73,25 @@ const ProfileTopBar = ({
 
       <div className="profile-menu-wrap" ref={menuRef}>
         <button type="button" className="profile-menu-btn" onClick={onToggleMenu}>
-          ...
+          More tools
         </button>
         {showMenu ? (
           <div className="profile-dropdown">
             <button type="button" className="profile-dropdown-item" onClick={onStartEdit}>
               Edit profile
             </button>
+            <button type="button" className="profile-dropdown-item" onClick={onTogglePrivacy}>
+              {isPrivate ? "Make profile public" : "Make profile private"}
+            </button>
             <button type="button" className="profile-dropdown-item" onClick={onResetPassword}>
               Change password
             </button>
-            <button type="button" className="profile-dropdown-item" onClick={onGoSettings}>
-              Settings
-            </button>
             <div className="profile-dropdown-sep" />
             <button type="button" className="profile-dropdown-item profile-dropdown-danger" onClick={onSignOut}>
-              Sign out
+              Log out
+            </button>
+            <button type="button" className="profile-dropdown-item profile-dropdown-danger" onClick={onDeleteAccount}>
+              Delete account
             </button>
           </div>
         ) : null}

@@ -79,7 +79,7 @@ useEffect(() => {
           )
         );
       });
-    } catch (error) {
+    } catch {
       setHistory((prev) =>
         prev.map((entry) =>
           entry.id === assistantId

@@ -6,7 +6,6 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useAuth } from "../hooks/useAuth";
 import { db } from "../firebase_config";
-import SettingsDropdown from "./SettingsDropdown";
 import "../styles/navbar.css";
 
 // Handles IconHome.
@@ -72,15 +71,6 @@ function IconBell() {
   );
 }
 
-// Handles IconTool.
-function IconTool() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6 10.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm6 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Zm6 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z" />
-    </svg>
-  );
-}
-
 // Handles IconHelp.
 function IconHelp() {
   return (
@@ -132,7 +122,6 @@ function Navbar() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [showSettings, setShowSettings] = useState(false);
   const [followingIds, setFollowingIds] = useState([]);
   const [activePeople, setActivePeople] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -563,22 +552,6 @@ function Navbar() {
             <IconHelp />
             <span className="sr-only">Help assistant</span>
           </NavLink>
-
-          {/* Settings menu. */}
-          <div className="navbar-settings-container">
-            <button
-              type="button"
-              className="nav-icon settings-btn"
-              onClick={() => setShowSettings(!showSettings)}
-              title="More"
-            >
-              <IconTool />
-              <span className="sr-only">More tools</span>
-            </button>
-            {showSettings && (
-              <SettingsDropdown onClose={() => setShowSettings(false)} user={user} />
-            )}
-          </div>
 
           <NavLink to="/profile" className="nav-icon" title="Profile">
             <IconUser />

@@ -69,30 +69,26 @@ async function request(path, { method = "GET", body, requiresAuth = true } = {})
   }
 
   if (response.status === 401 && requiresAuth) {
-    try {
-      const freshToken = await refreshIdTokenOrThrow();
-      headers.Authorization = `Bearer ${freshToken}`;
+    const freshToken = await refreshIdTokenOrThrow();
+    headers.Authorization = `Bearer ${freshToken}`;
 
-      const retryResponse = await fetch(`${API_BASE}${path}`, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-      });
+    const retryResponse = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
 
-      if (!retryResponse.ok) {
-        const retryData = await retryResponse.json().catch(() => ({}));
-        const retryDetail =
-          retryResponse.status === 429
-            ? toRateLimitMessage(retryResponse, retryData)
-            : retryData?.detail || retryData?.message || `Request failed (${retryResponse.status})`;
+    if (!retryResponse.ok) {
+      const retryData = await retryResponse.json().catch(() => ({}));
+      const retryDetail =
+        retryResponse.status === 429
+          ? toRateLimitMessage(retryResponse, retryData)
+          : retryData?.detail || retryData?.message || `Request failed (${retryResponse.status})`;
 
-        throw new Error(retryDetail);
-      }
-
-      return retryResponse.json();
-    } catch (retryError) {
-      throw retryError;
+      throw new Error(retryDetail);
     }
+
+    return retryResponse.json();
   }
 
   const data = await response.json().catch(() => ({}));

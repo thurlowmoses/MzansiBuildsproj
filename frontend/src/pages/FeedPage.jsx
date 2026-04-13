@@ -1,7 +1,6 @@
 ﻿// Purpose: Project source file used by the MzansiBuilds application.
 // Notes: Keep behavior-focused changes here and move cross-cutting logic to hooks/utilities.
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	addDoc,
@@ -73,7 +72,7 @@ function FeedPage() {
 			return;
 		}
 
-		const markCompleted = !Boolean(project.completed);
+		const markCompleted = !project.completed;
 		await updateDoc(doc(db, "projects", project.id), {
 			completed: markCompleted,
 			stage: markCompleted ? "completed" : "building",

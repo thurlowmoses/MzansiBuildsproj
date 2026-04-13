@@ -204,10 +204,12 @@
   border: 1px solid #333;
   color: #888;
   border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 18px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  letter-spacing: 2px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* Styles for .profile-dropdown. */
