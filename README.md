@@ -133,6 +133,8 @@ Current route modules and responsibilities:
 
 GitHub Actions workflow: `.github/workflows/continuous-delivery.yml`
 
+
+
 On push and pull request:
 
 - Frontend: `npm ci`, `npm run lint`, `npm run build`

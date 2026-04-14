@@ -3,6 +3,8 @@ name: Continuous Delivery
 permissions:
     contents: read
 
+# This workflow runs CI on every push and pull request, then deploys only when the matching secrets exist.
+
 on:
     push:
         branches:
