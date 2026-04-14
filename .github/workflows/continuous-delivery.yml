@@ -1,5 +1,8 @@
 name: Continuous Delivery
 
+permissions:
+    contents: read
+
 on:
     push:
         branches:
@@ -65,7 +68,7 @@ jobs:
         needs:
             - frontend-ci
             - backend-ci
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.VERCEL_DEPLOY_HOOK_URL != ''
         runs-on: ubuntu-latest
         environment:
             name: production
@@ -89,7 +92,7 @@ jobs:
         needs:
             - frontend-ci
             - backend-ci
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.RENDER_DEPLOY_HOOK_URL != ''
         runs-on: ubuntu-latest
         environment:
             name: production
