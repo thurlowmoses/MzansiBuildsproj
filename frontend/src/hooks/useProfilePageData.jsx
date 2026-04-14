@@ -146,6 +146,14 @@ const useProfilePageData = ({ user }) => {
       return;
     }
 
+    // Extension allowlist as a second validation layer.
+    const allowedExtensions = ["jpg", "jpeg", "png", "webp", "gif"];
+    const extension = file.name.split(".").pop()?.toLowerCase() || "";
+    if (!allowedExtensions.includes(extension)) {
+      setError("Only JPG, PNG, WebP and GIF files are allowed.");
+      return;
+    }
+
     if (file.size > 5 * 1024 * 1024) {
       setError("Image must be under 5MB.");
       return;
